@@ -24,23 +24,66 @@ repositories {
 	mavenCentral()
 }
 
+ext {
+	// 👇 Thay cho <properties> trong Maven
+	mapstructVersion = '1.5.5.Final'
+	lombokMapstructBindingVersion = '0.2.0'
+}
+
 dependencies {
+	// --- Spring Boot ---
 	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+
+	// --- Lombok ---
 	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	// --- MapStruct ---
+	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+	annotationProcessor "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
+
+	// --- DB & Dev ---
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'org.postgresql:postgresql'
-	annotationProcessor 'org.projectlombok:lombok'
+
+	// --- Test ---
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	
+	// --- JWT ---
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+// Thêm vào cuối file build.gradle
+tasks.withType(JavaCompile).configureEach {
+    options.getCompilerArgs().addAll([
+            '-Amapstruct.defaultComponentModel=spring'
+    ])
+}
+
+// Cấu hình để IDE (Eclipse/STS) có thể thấy code được sinh ra khi chạy test
+sourceSets {
+    test {
+        java {
+            srcDirs = ['src/test/java', 'build/generated/sources/annotationProcessor/java/test']
+        }
+    }
 }
