@@ -2,15 +2,14 @@ package com.example.demo.sale.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.io.Serializable; // Thêm import này
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Embeddable
-class PromotionAppliedOrderId implements Serializable { // Sửa lỗi ở đây
+class PromotionAppliedOrderId implements Serializable {
     @Column(name = "order_id")
     private Long orderId;
 
