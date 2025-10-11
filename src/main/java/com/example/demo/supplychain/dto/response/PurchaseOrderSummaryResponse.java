@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 @Data
 public class PurchaseOrderSummaryResponse {
-    private Long id;
+    private Integer id; // Đổi từ Long sang Integer để consistency
     private String supplierName;
     private LocalDate orderDate;
     private PurchaseOrderStatus status;

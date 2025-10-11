@@ -9,7 +9,7 @@ import java.util.List;
 
 @Data
 public class PurchaseOrderDetailResponse {
-    private Long id;
+    private Integer id; // Đổi từ Long sang Integer để consistency
     private String supplierName;
     private LocalDate orderDate;
     private LocalDate expectedDeliveryDate;
@@ -20,8 +20,8 @@ public class PurchaseOrderDetailResponse {
 
     @Data
     public static class ItemResponse {
-        private Long itemId;
-        private Long variantId;
+        private Integer itemId; // Đổi từ Long sang Integer để consistency
+        private Integer variantId; // Đổi từ Long sang Integer để consistency
         private String variantSku; // Mã SKU của biến thể sản phẩm
         private String variantName; // Tên của biến thể sản phẩm
         private Integer quantity;

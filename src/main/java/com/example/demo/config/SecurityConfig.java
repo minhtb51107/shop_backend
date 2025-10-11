@@ -12,23 +12,17 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        // Comment toàn bộ để disable security cho việc test Module 2
         http
             .authorizeHttpRequests(authz -> authz
-                // Cho phép truy cập Swagger UI và API docs mà không cần authentication
-                .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
-                // Cho phép truy cập các endpoint API mà không cần authentication (tạm thời)
-                .requestMatchers("/api/**").permitAll()
-                // Tất cả các request khác cần authentication
-                .anyRequest().authenticated()
+                .anyRequest().permitAll() // Cho phép tất cả request mà không cần authentication
             )
-            .formLogin(form -> form
-                .loginPage("/login")
-                .permitAll()
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS)
             )
-            .logout(logout -> logout
-                .permitAll()
-            )
-            .csrf(csrf -> csrf.disable()); // Tạm thời disable CSRF để test API
+            .httpBasic(httpBasic -> httpBasic.disable())
+            .formLogin(form -> form.disable());
 
         return http.build();
     }

@@ -1,7 +1,6 @@
-// File: src/main/java/com/example/demo/user/entity/PurchaseOrderItem.java
-
 package com.example.demo.supplychain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,19 +12,20 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "purchase_order_items")
+@Table(name = "supplychain_purchase_order_items") // Thêm prefix để tránh conflict
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class PurchaseOrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "purchase_order_id", nullable = false)
+    @JsonIgnoreProperties({"items"}) // Tránh circular reference
     private PurchaseOrder purchaseOrder;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "variant_id", nullable = false)
-    private ProductVariant variant; // Giả định đã có entity ProductVariant
+    @Column(name = "variant_id", nullable = false)
+    private Integer variantId; // Chỉ lưu ID thay vì reference
 
     @Column(nullable = false)
     private Integer quantity;

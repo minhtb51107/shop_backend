@@ -16,7 +16,7 @@ public interface PurchaseOrderService {
     /**
      * Lấy thông tin chi tiết của một đơn đặt hàng theo ID.
      */
-    PurchaseOrderDetailResponse findPurchaseOrderById(Long id);
+    PurchaseOrderDetailResponse findPurchaseOrderById(Integer id);
 
     /**
      * Lấy danh sách tóm tắt tất cả các đơn đặt hàng.

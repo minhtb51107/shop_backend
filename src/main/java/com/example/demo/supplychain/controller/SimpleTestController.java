@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1") // Thêm /v1 để consistency
 @CrossOrigin(origins = "*")
 public class SimpleTestController {
 

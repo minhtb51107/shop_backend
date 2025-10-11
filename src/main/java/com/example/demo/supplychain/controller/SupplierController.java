@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/suppliers")
+@RequestMapping("/api/v1/suppliers") // Thêm /api/v1/ để consistency
 @RequiredArgsConstructor
 public class SupplierController {
 

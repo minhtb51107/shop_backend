@@ -1,4 +1,4 @@
-// File: src/main/java/com/example/demo/user/controller/PurchaseOrderController.java
+// File: src/main/java/com/example/demo/supplychain/controller/PurchaseOrderController.java
 package com.example.demo.supplychain.controller;
 
 import com.example.demo.supplychain.dto.request.CreatePurchaseOrderRequest;
@@ -27,7 +27,7 @@ public class PurchaseOrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PurchaseOrderDetailResponse> getPurchaseOrderById(@PathVariable Long id) {
+    public ResponseEntity<PurchaseOrderDetailResponse> getPurchaseOrderById(@PathVariable Integer id) {
         PurchaseOrderDetailResponse orderDetail = purchaseOrderService.findPurchaseOrderById(id);
         return ResponseEntity.ok(orderDetail);
     }

@@ -1,5 +1,6 @@
 package com.example.demo.supplychain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,11 +13,12 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "goods_receipts")
+@Table(name = "supplychain_goods_receipts") // Thêm prefix để tránh conflict
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class GoodsReceipt {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "purchase_order_id")
@@ -29,9 +31,8 @@ public class GoodsReceipt {
     @Column(name = "receipt_date", nullable = false)
     private LocalDate receiptDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by_employee_id", nullable = false)
-    private Employee createdBy;
+    @Column(name = "created_by_employee_id", nullable = false)
+    private Integer createdByEmployeeId; // Chỉ lưu ID thay vì reference
 
     @OneToMany(mappedBy = "goodsReceipt", cascade = CascadeType.ALL)
     private List<GoodsReceiptItem> items;

@@ -1,5 +1,0 @@
-package com.example.demo.supplychain.controller;
-
-public class UserActivityLogController {
-
-}

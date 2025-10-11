@@ -1,4 +1,4 @@
-// File: src/main/java/com/example/demo/user/service/impl/PurchaseOrderServiceImpl.java
+// File: src/main/java/com/example/demo/supplychain/service/impl/PurchaseOrderServiceImpl.java
 package com.example.demo.supplychain.service.impl;
 
 import com.example.demo.supplychain.dto.request.CreatePurchaseOrderRequest;
@@ -7,8 +7,6 @@ import com.example.demo.supplychain.dto.response.PurchaseOrderSummaryResponse;
 import com.example.demo.supplychain.entity.*;
 import com.example.demo.supplychain.enums.PurchaseOrderStatus;
 import com.example.demo.supplychain.mapper.PurchaseOrderMapper;
-import com.example.demo.supplychain.repository.EmployeeRepository;
-import com.example.demo.supplychain.repository.ProductVariantRepository;
 import com.example.demo.supplychain.repository.PurchaseOrderRepository;
 import com.example.demo.supplychain.repository.SupplierRepository;
 import com.example.demo.supplychain.service.PurchaseOrderService;
@@ -27,8 +25,6 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
     private final PurchaseOrderRepository purchaseOrderRepo;
     private final SupplierRepository supplierRepo;
-    private final ProductVariantRepository variantRepo;
-    private final EmployeeRepository employeeRepo;
     private final PurchaseOrderMapper purchaseOrderMapper; // Dùng Mapper để chuyển đổi
 
     @Override
@@ -37,23 +33,19 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         // ... (Logic tạo PurchaseOrder và PurchaseOrderItem như cũ)
         Supplier supplier = supplierRepo.findById(request.getSupplierId())
                 .orElseThrow(() -> new EntityNotFoundException("Supplier not found"));
-        Employee currentEmployee = employeeRepo.findById(1)
-                .orElseThrow(() -> new EntityNotFoundException("Employee not found"));
 
         PurchaseOrder po = PurchaseOrder.builder()
                 .supplier(supplier)
                 .orderDate(LocalDate.now())
                 .expectedDeliveryDate(request.getExpectedDeliveryDate())
                 .status(PurchaseOrderStatus.DRAFT)
-                .createdBy(currentEmployee)
+                .createdByEmployeeId(1) // Tạm thời hardcode employee ID
                 .build();
 
         List<PurchaseOrderItem> items = request.getItems().stream().map(itemDto -> {
-            ProductVariant variant = variantRepo.findById(itemDto.getVariantId())
-                    .orElseThrow(() -> new EntityNotFoundException("Product Variant not found"));
             return PurchaseOrderItem.builder()
                     .purchaseOrder(po)
-                    .variant(variant)
+                    .variantId(itemDto.getVariantId()) // Chỉ lưu ID thay vì reference
                     .quantity(itemDto.getQuantity())
                     .unitPrice(itemDto.getUnitPrice())
                     .build();
@@ -68,7 +60,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
     @Override
     @Transactional(readOnly = true) // readOnly = true để tối ưu cho các tác vụ chỉ đọc
-    public PurchaseOrderDetailResponse findPurchaseOrderById(Long id) {
+    public PurchaseOrderDetailResponse findPurchaseOrderById(Integer id) {
         PurchaseOrder po = purchaseOrderRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Purchase Order not found with id: " + id));
         return purchaseOrderMapper.toDetailResponse(po);

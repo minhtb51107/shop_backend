@@ -14,7 +14,7 @@ public class CreatePurchaseOrderRequest {
 
     @Data
     public static class ItemRequest {
-        private Long variantId;
+        private Integer variantId; // Đổi từ Long sang Integer để consistency
         private Integer quantity;
         private BigDecimal unitPrice;
     }

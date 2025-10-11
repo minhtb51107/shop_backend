@@ -1,6 +1,7 @@
 package com.example.demo.supplychain.entity;
 
 import com.example.demo.supplychain.enums.PurchaseOrderStatus;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,14 +14,16 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "purchase_orders")
+@Table(name = "supplychain_purchase_orders") // Thêm prefix để tránh conflict
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class PurchaseOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "supplier_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Supplier supplier;
 
     @Column(name = "order_date", nullable = false)
@@ -33,10 +36,10 @@ public class PurchaseOrder {
     @Column(name = "status", nullable = false, length = 50)
     private PurchaseOrderStatus status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by_employee_id", nullable = false)
-    private Employee createdBy;
+    @Column(name = "created_by_employee_id", nullable = false)
+    private Integer createdByEmployeeId; // Chỉ lưu ID thay vì reference
 
     @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties({"purchaseOrder"}) // Tránh circular reference
     private List<PurchaseOrderItem> items;
 }

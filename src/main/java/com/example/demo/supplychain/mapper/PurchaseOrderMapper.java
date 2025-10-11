@@ -1,4 +1,4 @@
-// File: src/main/java/com/example/demo/user/mapper/PurchaseOrderMapper.java
+// File: src/main/java/com/example/demo/supplychain/mapper/PurchaseOrderMapper.java
 package com.example.demo.supplychain.mapper;
 
 import com.example.demo.supplychain.dto.response.PurchaseOrderDetailResponse;
@@ -17,7 +17,7 @@ import java.util.List;
 public interface PurchaseOrderMapper {
 
     @Mapping(source = "supplier.name", target = "supplierName")
-    @Mapping(source = "createdBy.fullname", target = "createdByName")
+    @Mapping(source = "createdByEmployeeId", target = "createdByName") // Chỉ lưu ID thay vì reference
     @Mapping(target = "grandTotal", ignore = true)
     PurchaseOrderDetailResponse toDetailResponse(PurchaseOrder purchaseOrder);
 
@@ -28,9 +28,9 @@ public interface PurchaseOrderMapper {
     List<PurchaseOrderSummaryResponse> toSummaryResponseList(List<PurchaseOrder> purchaseOrders);
 
     @Mapping(source = "id", target = "itemId")
-    @Mapping(source = "variant.id", target = "variantId")
-    @Mapping(source = "variant.sku", target = "variantSku")
-    @Mapping(source = "variant.product.name", target = "variantName")
+    @Mapping(source = "variantId", target = "variantId") // Chỉ lưu ID thay vì reference
+    @Mapping(target = "variantSku", ignore = true) // Không có reference đến ProductVariant
+    @Mapping(target = "variantName", ignore = true) // Không có reference đến ProductVariant
     @Mapping(target = "totalPrice", ignore = true)
     PurchaseOrderDetailResponse.ItemResponse itemToItemResponse(PurchaseOrderItem item);
 

@@ -1,5 +1,6 @@
 package com.example.demo.supplychain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,7 +10,8 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "warehouses")
+@Table(name = "supplychain_warehouses") // Thêm prefix để tránh conflict
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Warehouse {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
