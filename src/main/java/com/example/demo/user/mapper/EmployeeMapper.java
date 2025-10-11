@@ -3,25 +3,40 @@ package com.example.demo.user.mapper;
 import com.example.demo.user.dto.request.CreateEmployeeRequest;
 import com.example.demo.user.dto.response.EmployeeResponse;
 import com.example.demo.user.entity.Employee;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
+import com.example.demo.user.entity.Role;
+import org.springframework.stereotype.Component;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring")
-public interface EmployeeMapper {
-    
-    EmployeeMapper INSTANCE = Mappers.getMapper(EmployeeMapper.class);
+@Component
+public class EmployeeMapper {
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "user", ignore = true)
-    @Mapping(target = "active", ignore = true)
-    @Mapping(target = "roles", ignore = true)
-    Employee toEmployeeEntity(CreateEmployeeRequest request);
-    
-    @Mapping(source = "user.email", target = "email")
-    @Mapping(source = "user.status", target = "status")
-    @Mapping(source = "active", target = "isActive")
-    // SỬA LẠI EXPRESSION, GHI ĐẦY ĐỦ ĐƯỜNG DẪN PACKAGE
-    @Mapping(target = "roleNames", expression = "java(employee.getRoles() != null ? employee.getRoles().stream().map(com.example.demo.user.entity.Role::getName).collect(java.util.stream.Collectors.toSet()) : java.util.Collections.emptySet())")
-    EmployeeResponse toEmployeeResponse(Employee employee);
+    public Employee toEmployeeEntity(CreateEmployeeRequest request) {
+        if (request == null) return null;
+        return Employee.builder()
+                .fullname(request.getFullname())
+                .employeeCode(request.getEmployeeCode())
+                .position(request.getPosition())
+                .department(request.getDepartment())
+                .hiredDate(request.getHiredDate())
+                .build();
+    }
+
+    public EmployeeResponse toEmployeeResponse(Employee employee) {
+        if (employee == null) return null;
+        return EmployeeResponse.builder()
+                .id(employee.getId())
+                .employeeCode(employee.getEmployeeCode())
+                .fullname(employee.getFullname())
+                .position(employee.getPosition())
+                .department(employee.getDepartment())
+                .hiredDate(employee.getHiredDate())
+                .isActive(employee.isActive())
+                .email(employee.getUser() != null ? employee.getUser().getEmail() : null)
+                .status(employee.getUser() != null ? employee.getUser().getStatus().name() : null)
+                .roleNames(employee.getRoles() != null ?
+                        employee.getRoles().stream().map(Role::getName).collect(Collectors.toSet()) :
+                        Collections.emptySet())
+                .build();
+    }
 }

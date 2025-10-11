@@ -1,13 +1,20 @@
 package com.example.demo.user.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-
 import com.example.demo.user.dto.response.UserActivityLogResponse;
 import com.example.demo.user.entity.UserActivityLog;
+import org.springframework.stereotype.Component;
 
-@Mapper(componentModel = "spring")
-public interface UserActivityLogMapper {
-    @Mapping(source = "user.email", target = "userEmail")
-    UserActivityLogResponse toResponse(UserActivityLog log);
+@Component
+public class UserActivityLogMapper {
+
+    public UserActivityLogResponse toResponse(UserActivityLog log) {
+        if (log == null) return null;
+        return UserActivityLogResponse.builder()
+                .id(log.getId())
+                .action(log.getAction())
+                .details(log.getDetails())
+                .createdAt(log.getCreatedAt())
+                .userEmail(log.getUser() != null ? log.getUser().getEmail() : null)
+                .build();
+    }
 }

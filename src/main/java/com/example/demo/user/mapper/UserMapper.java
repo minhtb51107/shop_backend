@@ -5,44 +5,42 @@ import com.example.demo.user.entity.Employee;
 import com.example.demo.user.entity.Permission;
 import com.example.demo.user.entity.Role;
 import com.example.demo.user.entity.User;
-import org.mapstruct.AfterMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.factory.Mappers;
+import org.springframework.stereotype.Component;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring")
-public interface UserMapper {
+@Component
+public class UserMapper {
 
-    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
+    public UserDetailsResponse toUserDetailsResponse(User user) {
+        if (user == null) return null;
 
-    // Bỏ qua các trường sẽ được xử lý trong @AfterMapping để hết warning
-    @org.mapstruct.Mapping(target = "fullname", ignore = true)
-    @org.mapstruct.Mapping(target = "userType", ignore = true)
-    @org.mapstruct.Mapping(target = "roles", ignore = true)
-    @org.mapstruct.Mapping(target = "permissions", ignore = true)
-    UserDetailsResponse toUserDetailsResponse(User user);
+        UserDetailsResponse.UserDetailsResponseBuilder builder = UserDetailsResponse.builder()
+                .id(user.getId())
+                .email(user.getEmail());
 
-    @AfterMapping
-    default void afterMapToUserDetailsResponse(User user, @MappingTarget UserDetailsResponse response) {
         if (user.getCustomer() != null) {
-            response.setFullname(user.getCustomer().getFullname());
-            response.setUserType("CUSTOMER");
+            builder.fullname(user.getCustomer().getFullname())
+                   .userType("CUSTOMER");
         } else if (user.getEmployee() != null) {
             Employee employee = user.getEmployee();
-            response.setFullname(employee.getFullname());
-            response.setUserType("EMPLOYEE");
-            
+            builder.fullname(employee.getFullname())
+                   .userType("EMPLOYEE");
+
             if (employee.getRoles() != null) {
-                response.setRoles(employee.getRoles().stream()
-                        .map(Role::getName)
-                        .collect(Collectors.toSet()));
-                
-                response.setPermissions(employee.getRoles().stream()
-                        .flatMap(role -> role.getPermissions().stream())
-                        .map(Permission::getName)
-                        .collect(Collectors.toSet()));
+                builder.roles(employee.getRoles().stream()
+                                .map(Role::getName)
+                                .collect(Collectors.toSet()));
+
+                builder.permissions(employee.getRoles().stream()
+                                .flatMap(role -> role.getPermissions().stream())
+                                .map(Permission::getName)
+                                .collect(Collectors.toSet()));
+            } else {
+                 builder.roles(Collections.emptySet());
+                 builder.permissions(Collections.emptySet());
             }
         }
+        return builder.build();
     }
 }

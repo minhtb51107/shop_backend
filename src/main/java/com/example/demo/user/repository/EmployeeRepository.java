@@ -37,5 +37,5 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
      * @param isActive true để tìm nhân viên đang hoạt động, false ngược lại.
      * @return List các Employee theo trạng thái.
      */
-    List<Employee> findByIsActive(boolean isActive);
+    List<Employee> findByActive(boolean isActive);
 }

@@ -1,20 +1,32 @@
 package com.example.demo.user.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
-
 import com.example.demo.user.dto.response.RoleWithPermissionsResponse;
 import com.example.demo.user.entity.Permission;
 import com.example.demo.user.entity.Role;
+import org.springframework.stereotype.Component;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring")
-public interface RoleMapper {
+@Component
+public class RoleMapper {
 
-    RoleMapper INSTANCE = Mappers.getMapper(RoleMapper.class);
+    public RoleWithPermissionsResponse toRoleWithPermissionsResponse(Role role) {
+        if (role == null) return null;
+        return RoleWithPermissionsResponse.builder()
+                .id(role.getId())
+                .name(role.getName())
+                .description(role.getDescription())
+                .permissions(role.getPermissions() != null ?
+                        role.getPermissions().stream().map(this::toPermissionResponse).collect(Collectors.toSet()) :
+                        Collections.emptySet())
+                .build();
+    }
 
-    // MapStruct sẽ tự động tìm và sử dụng phương thức toPermissionResponse bên dưới
-    RoleWithPermissionsResponse toRoleWithPermissionsResponse(Role role);
-
-    // Chuyển Permission Entity sang PermissionResponse DTO (lớp con trong DTO chính)
-    RoleWithPermissionsResponse.PermissionResponse toPermissionResponse(Permission permission);
+    public RoleWithPermissionsResponse.PermissionResponse toPermissionResponse(Permission permission) {
+        if (permission == null) return null;
+        return RoleWithPermissionsResponse.PermissionResponse.builder()
+                .name(permission.getName())
+                .description(permission.getDescription())
+                .build();
+    }
 }
