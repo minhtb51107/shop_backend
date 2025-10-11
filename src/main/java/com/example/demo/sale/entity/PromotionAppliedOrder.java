@@ -5,17 +5,17 @@ import lombok.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Embeddable
-class PromotionAppliedOrderId implements Serializable {
-    @Column(name = "order_id")
-    private Long orderId;
-
-    @Column(name = "campaign_id")
-    private Integer campaignId;
-}
+//@Data
+//@NoArgsConstructor
+//@AllArgsConstructor
+//@Embeddable
+//class PromotionAppliedOrderId implements Serializable {
+//    @Column(name = "order_id")
+//    private Long orderId;
+//
+//    @Column(name = "campaign_id")
+//    private Integer campaignId;
+//}
 
 @Getter
 @Setter

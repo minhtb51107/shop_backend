@@ -6,6 +6,7 @@ import com.example.demo.sale.entity.WarrantyCase;
 import com.example.demo.sale.mapper.WarrantyMapper;
 import com.example.demo.sale.repository.OrderItemRepository;
 import com.example.demo.sale.repository.WarrantyCaseRepository;
+import com.example.demo.sale.service.WarrantyService;
 import com.example.demo.user.repository.CustomerRepository;
 import com.example.demo.user.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +27,8 @@ public class WarrantyServiceImpl implements WarrantyService {
     public WarrantyCaseResponse createWarrantyCase(CreateWarrantyCaseRequest request) {
         WarrantyCase warrantyCase = warrantyMapper.toEntity(request);
         warrantyCase.setOrderItem(orderItemRepository.findById(request.getOrderItemId()).orElseThrow());
-        warrantyCase.setCustomer(customerRepository.findById(request.getCustomerId()).orElseThrow());
-        warrantyCase.setCreatedBy(employeeRepository.findById(request.getCreatedByEmployeeId()).orElseThrow());
+        warrantyCase.setCustomer(customerRepository.findById(request.getCustomerId().intValue()).orElseThrow());
+        warrantyCase.setCreatedBy(employeeRepository.findById(request.getCreatedByEmployeeId().intValue()).orElseThrow());
         warrantyCase.setStatus("RECEIVED");
 
         WarrantyCase savedCase = warrantyCaseRepository.save(warrantyCase);

@@ -5,6 +5,8 @@ import com.example.demo.sale.dto.response.PromotionResponse;
 import com.example.demo.sale.entity.PromotionCampaign;
 import com.example.demo.sale.mapper.PromotionMapper;
 import com.example.demo.sale.repository.PromotionCampaignRepository;
+import com.example.demo.sale.service.PromotionService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

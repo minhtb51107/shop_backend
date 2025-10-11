@@ -1,12 +1,14 @@
 package com.example.demo.sale.service.impl;
 
-import com.example.demo.product.repository.ProductVariantRepository;
+import com.example.demo.product.entity.ProductVariant;
+import com.example.demo.product.repository.VariantRepository;
 import com.example.demo.sale.dto.request.CreateOrderRequest;
 import com.example.demo.sale.dto.response.OrderResponse;
 import com.example.demo.sale.entity.Order;
 import com.example.demo.sale.entity.OrderItem;
 import com.example.demo.sale.mapper.OrderMapper;
 import com.example.demo.sale.repository.OrderRepository;
+import com.example.demo.sale.service.OrderService;
 import com.example.demo.user.repository.CustomerRepository;
 import com.example.demo.supplychain.repository.WarehouseRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +25,7 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final CustomerRepository customerRepository;
-    private final ProductVariantRepository productVariantRepository;
+    private final VariantRepository productVariantRepository;
     private final WarehouseRepository warehouseRepository;
     private final OrderMapper orderMapper;
 
@@ -31,18 +33,25 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderResponse createOrder(CreateOrderRequest request) {
         Order order = new Order();
-        order.setCustomer(customerRepository.findById(request.getCustomerId()).orElseThrow());
-        order.setWarehouse(warehouseRepository.findById(request.getWarehouseId()).orElseThrow());
+        order.setCustomer(customerRepository.findById(request.getCustomerId().intValue()).orElseThrow());
+        order.setWarehouse(warehouseRepository.findById(request.getWarehouseId().intValue()).orElseThrow());
         order.setShippingAddress(request.getShippingAddress());
         order.setCreatedAt(OffsetDateTime.now());
         order.setStatus("PENDING");
-
         Set<OrderItem> items = request.getItems().stream().map(itemDto -> {
             OrderItem item = new OrderItem();
             item.setOrder(order);
             item.setQuantity(itemDto.getQuantity());
-            item.setVariant(productVariantRepository.findById(itemDto.getVariantId()).orElseThrow());
-            item.setPriceAtPurchase(item.getVariant().getPrice());
+
+            // Lưu đối tượng ProductVariant đã tìm được vào một biến tạm thời
+            ProductVariant variant = productVariantRepository.findById(itemDto.getVariantId().longValue()).orElseThrow();
+            
+            // Sử dụng biến tạm thời để gán cho item
+            item.setVariant(variant);
+            
+            // Sử dụng biến tạm thời để lấy giá
+            item.setPriceAtPurchase(variant.getPrice());
+            
             return item;
         }).collect(Collectors.toSet());
 

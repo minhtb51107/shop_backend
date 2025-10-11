@@ -8,6 +8,7 @@ import com.example.demo.sale.mapper.ReturnMapper;
 import com.example.demo.sale.repository.OrderItemRepository;
 import com.example.demo.sale.repository.OrderRepository;
 import com.example.demo.sale.repository.ReturnRepository;
+import com.example.demo.sale.service.ReturnService;
 import com.example.demo.user.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,7 @@ public class ReturnServiceImpl implements ReturnService {
     public ReturnResponse createReturn(CreateReturnRequest request) {
         Return returnEntity = returnMapper.toEntity(request);
         returnEntity.setOrder(orderRepository.findById(request.getOrderId()).orElseThrow());
-        returnEntity.setCreatedBy(employeeRepository.findById(request.getCreatedByEmployeeId()).orElseThrow());
+        returnEntity.setCreatedBy(employeeRepository.findById(request.getCreatedByEmployeeId().intValue()).orElseThrow());
         returnEntity.setStatus("REQUESTED");
 
         Set<ReturnItem> items = request.getItems().stream().map(itemDto -> {

@@ -1,8 +1,7 @@
 package com.example.demo.sale.entity;
-
+import com.example.demo.supplychain.entity.Warehouse;
 import com.example.demo.user.entity.Customer;
 import com.example.demo.user.entity.Employee;
-import com.example.demo.supplychain.entity.Warehouse;
 import jakarta.persistence.*;
 import lombok.*;
 
