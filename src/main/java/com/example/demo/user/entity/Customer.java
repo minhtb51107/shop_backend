@@ -17,14 +17,14 @@ public class Customer {
     private Integer id;
 
     // Quan hệ 1-1, user_id là khóa ngoại và là duy nhất
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL) // <-- THÊM CASCADE VÀO ĐÂY
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, unique = true)
     private User user;
 
     @Column(name = "fullname", nullable = false, length = 100)
     private String fullname;
 
-    @Column(name = "phone_number", nullable = false, unique = true, length = 20)
+    @Column(name = "phone_number", unique = true, length = 20) // Xóa nullable = false
     private String phoneNumber;
 
     @Column(name = "photo", length = 255)

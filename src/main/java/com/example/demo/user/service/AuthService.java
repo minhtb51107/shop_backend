@@ -25,4 +25,6 @@ public interface AuthService {
      * @return JwtResponse chứa access token mới.
      */
     JwtResponse refreshToken(String refreshToken);
+    
+    JwtResponse loginWithGoogle(String idToken);
 }

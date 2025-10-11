@@ -1,5 +1,6 @@
 package com.example.demo.user.service.impl;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,6 +24,19 @@ import com.example.demo.user.repository.CustomerRepository;
 import com.example.demo.user.repository.RoleRepository;
 import com.example.demo.user.repository.UserRepository;
 import com.example.demo.user.service.AuthService;
+import com.example.demo.user.entity.UserSession;
+import com.example.demo.user.repository.UserSessionRepository;
+import java.time.OffsetDateTime;
+
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
+import org.springframework.beans.factory.annotation.Value;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.Collections;
+import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 
@@ -38,6 +52,13 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
+    private final UserSessionRepository userSessionRepository;
+    
+    @Value("${spring.security.oauth2.client.registration.google.client-id}")
+    private String googleClientId;
+    
+    @Value("${app.jwt.refresh-token-expiration-ms}") 
+    private long refreshTokenExpirationMs;
 
     @Override
     public void registerCustomer(RegisterRequest request) {
@@ -84,6 +105,15 @@ public class AuthServiceImpl implements AuthService {
         // 4. Tạo access token và refresh token
         String accessToken = jwtUtil.generateAccessToken(user);
         String refreshToken = jwtUtil.generateRefreshToken(user);
+        
+        // Lưu refresh token vào CSDL
+        UserSession session = UserSession.builder()
+                .user(user)
+                .refreshToken(refreshToken)
+                .expiresAt(OffsetDateTime.now().plusSeconds(refreshTokenExpirationMs / 1000))
+                // TODO: Lấy User-Agent và IP Address từ request để tăng cường bảo mật
+                .build();
+        userSessionRepository.save(session);
 
         // TODO: Lưu refresh token vào bảng user_sessions
 
@@ -95,8 +125,86 @@ public class AuthServiceImpl implements AuthService {
     
     @Override
     public JwtResponse refreshToken(String refreshToken) {
-        // TODO: Validate refresh token từ CSDL (bảng user_sessions)
-        // Nếu hợp lệ, tạo access token mới và trả về
-        return null;
+        // 1. Tìm session trong CSDL
+        UserSession session = userSessionRepository.findByRefreshToken(refreshToken)
+                .orElseThrow(() -> new BadRequestException("Refresh token không hợp lệ."));
+
+        // 2. Kiểm tra token đã hết hạn chưa
+        if (session.getExpiresAt().isBefore(OffsetDateTime.now())) {
+            userSessionRepository.delete(session); // Xóa token hết hạn
+            throw new BadRequestException("Refresh token đã hết hạn.");
+        }
+
+        // 3. Lấy thông tin user
+        User user = session.getUser();
+
+        // 4. Tạo access token mới
+        String newAccessToken = jwtUtil.generateAccessToken(user);
+
+        // Trả về access token mới (refresh token giữ nguyên)
+        return JwtResponse.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
+    
+    @Override
+    public JwtResponse loginWithGoogle(String idTokenString) {
+        try {
+            // 1. Xác thực ID Token với Google
+            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
+                    .setAudience(Collections.singletonList(googleClientId))
+                    .build();
+
+            GoogleIdToken idToken = verifier.verify(idTokenString);
+            if (idToken == null) {
+                throw new BadRequestException("Token Google không hợp lệ.");
+            }
+
+            // 2. Lấy thông tin người dùng từ token payload
+            GoogleIdToken.Payload payload = idToken.getPayload();
+            String email = payload.getEmail();
+
+            // 3. Tìm người dùng trong CSDL, nếu không có thì tạo mới
+            User user = userRepository.findByEmail(email)
+                    .orElseGet(() -> registerNewUserFromGoogle(payload));
+            
+            // 4. Tạo JWT token của hệ thống và trả về
+            String accessToken = jwtUtil.generateAccessToken(user);
+            String refreshToken = jwtUtil.generateRefreshToken(user);
+
+            // TODO: Lưu refresh token vào user_sessions giống như luồng đăng nhập thường
+            
+            return JwtResponse.builder()
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
+                    .build();
+
+        } catch (GeneralSecurityException | IOException e) {
+            throw new BadRequestException("Xác thực Google thất bại: " + e.getMessage());
+        }
+    }
+
+    private User registerNewUserFromGoogle(GoogleIdToken.Payload payload) {
+        String email = payload.getEmail();
+        String name = (String) payload.get("name");
+        String pictureUrl = (String) payload.get("picture");
+
+        // Tạo User mới
+        User newUser = new User();
+        newUser.setEmail(email);
+        newUser.setPassword(passwordEncoder.encode(UUID.randomUUID().toString())); // Mật khẩu ngẫu nhiên, không dùng
+        newUser.setStatus(UserStatus.ACTIVE);
+
+        // Tạo Customer tương ứng
+        Customer newCustomer = new Customer();
+        newCustomer.setFullname(name);
+        newCustomer.setPhoto(pictureUrl);
+        newCustomer.setUser(newUser); // Liên kết với user
+        // Số điện thoại có thể để trống (NULL)
+
+        customerRepository.save(newCustomer); // Lưu customer (user sẽ được lưu theo nhờ cascade)
+        
+        return newUser;
     }
 }

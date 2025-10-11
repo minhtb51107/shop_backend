@@ -21,7 +21,7 @@ public class Employee {
     @Column(name = "employee_code", nullable = false, unique = true, length = 20)
     private String employeeCode;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL) // <-- THÊM CASCADE VÀO ĐÂY
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, unique = true)
     private User user;
 
@@ -43,7 +43,7 @@ public class Employee {
 
     // --- Relationships ---
 
-    @ManyToMany(fetch = FetchType.EAGER) // Tải các role cùng lúc với employee
+    @ManyToMany // XÓA BỎ: fetch = FetchType.EAGER
     @JoinTable(
         name = "employee_roles",
         joinColumns = @JoinColumn(name = "employee_id"),
