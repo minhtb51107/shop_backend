@@ -2,7 +2,7 @@ package com.example.demo.sale.controller;
 
 import com.example.demo.sale.dto.request.CreatePaymentRequest;
 import com.example.demo.sale.dto.response.PaymentResponse;
-import com.example.demo.sale.service.PaymentService; // Giả định bạn có PaymentService
+import com.example.demo.sale.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -23,6 +23,20 @@ public class PromotionServiceImpl implements PromotionService {
     @Override
     @Transactional
     public PromotionResponse createPromotion(CreatePromotionRequest request) {
+        // Manual Validation
+        if (request.getName() == null || request.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Promotion name must not be empty.");
+        }
+        if (request.getStartDate() == null || request.getEndDate() == null) {
+            throw new IllegalArgumentException("Start date and end date must not be null.");
+        }
+        if (request.getDiscountType() == null || request.getDiscountType().trim().isEmpty()) {
+            throw new IllegalArgumentException("Discount type must not be empty.");
+        }
+        if (request.getDiscountValue() == null) {
+            throw new IllegalArgumentException("Discount value must not be null.");
+        }
+
         PromotionCampaign campaign = promotionMapper.toEntity(request);
         PromotionCampaign savedCampaign = promotionCampaignRepository.save(campaign);
         return promotionMapper.toDto(savedCampaign);
@@ -35,7 +49,7 @@ public class PromotionServiceImpl implements PromotionService {
     }
 
     @Override
-    public List<PromotionResponse> getAllPromotions() {
+    public List<PromotionResponse> findAllPromotions() {
         return promotionCampaignRepository.findAll().stream()
                 .map(promotionMapper::toDto)
                 .collect(Collectors.toList());

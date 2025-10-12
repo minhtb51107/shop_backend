@@ -14,6 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class WarrantyServiceImpl implements WarrantyService {
@@ -26,6 +29,17 @@ public class WarrantyServiceImpl implements WarrantyService {
     @Override
     @Transactional
     public WarrantyCaseResponse createWarrantyCase(CreateWarrantyCaseRequest request) {
+        // Manual Validation
+        if (request.getOrderItemId() == null) {
+            throw new IllegalArgumentException("Order item ID must not be null.");
+        }
+        if (request.getCustomerId() == null) {
+            throw new IllegalArgumentException("Customer ID must not be null.");
+        }
+        if (request.getCreatedByEmployeeId() == null) {
+            throw new IllegalArgumentException("Created By Employee ID must not be null.");
+        }
+
         WarrantyCase warrantyCase = warrantyMapper.toEntity(request);
         
         warrantyCase.setOrderItem(orderItemRepository.findById(request.getOrderItemId())
@@ -41,5 +55,19 @@ public class WarrantyServiceImpl implements WarrantyService {
 
         WarrantyCase savedCase = warrantyCaseRepository.save(warrantyCase);
         return warrantyMapper.toDto(savedCase);
+    }
+
+    @Override
+    public WarrantyCaseResponse getWarrantyCaseById(Long id) {
+        WarrantyCase warrantyCase = warrantyCaseRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Warranty case not found with id: " + id));
+        return warrantyMapper.toDto(warrantyCase);
+    }
+
+    @Override
+    public List<WarrantyCaseResponse> findAllWarrantyCases() {
+        return warrantyCaseRepository.findAll().stream()
+                .map(warrantyMapper::toDto)
+                .collect(Collectors.toList());
     }
 }

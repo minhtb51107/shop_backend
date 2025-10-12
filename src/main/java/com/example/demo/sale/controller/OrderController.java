@@ -27,13 +27,10 @@ public class OrderController {
         return ResponseEntity.ok(orderResponse);
     }
 
-    // Endpoint này giả định bạn có một phương thức trong OrderService để lấy tất cả các đơn hàng.
     @GetMapping
     public ResponseEntity<List<OrderResponse>> getAllOrders() {
-        // Giả định có phương thức findAllOrders trong service
-        // List<OrderResponse> orders = orderService.findAllOrders();
-        // return ResponseEntity.ok(orders);
-        return ResponseEntity.ok().build();
+        List<OrderResponse> orders = orderService.findAllOrders();
+        return ResponseEntity.ok(orders);
     }
 
     @PutMapping("/{id}/status")

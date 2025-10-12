@@ -8,4 +8,5 @@ public class CreateWarrantyCaseRequest {
     private String serialNumber;
     private Long customerId;
     private String description;
+    private Integer createdByEmployeeId;
 }

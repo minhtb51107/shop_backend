@@ -2,7 +2,7 @@ package com.example.demo.sale.controller;
 
 import com.example.demo.sale.dto.request.CreateReturnRequest;
 import com.example.demo.sale.dto.response.ReturnResponse;
-import com.example.demo.sale.service.ReturnService; // Giả định bạn có ReturnService
+import com.example.demo.sale.service.ReturnService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

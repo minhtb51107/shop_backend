@@ -38,12 +38,32 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderResponse createOrder(CreateOrderRequest request) {
+        // Manual Validation
+        if (request.getCustomerId() == null) {
+            throw new IllegalArgumentException("Customer ID must not be null.");
+        }
+        if (request.getWarehouseId() == null) {
+            throw new IllegalArgumentException("Warehouse ID must not be null.");
+        }
+        if (request.getItems() == null || request.getItems().isEmpty()) {
+            throw new IllegalArgumentException("Order must contain at least one item.");
+        }
+        for (CreateOrderRequest.ItemRequest item : request.getItems()) {
+            if (item.getVariantId() == null) {
+                throw new IllegalArgumentException("Item variant ID must not be null.");
+            }
+            if (item.getQuantity() == null || item.getQuantity() <= 0) {
+                throw new IllegalArgumentException("Item quantity must be a positive number.");
+            }
+        }
+        
         Customer customer = customerRepository.findById(request.getCustomerId().intValue())
                 .orElseThrow(() -> new EntityNotFoundException("Customer not found with id: " + request.getCustomerId()));
         
         Warehouse warehouse = warehouseRepository.findById(request.getWarehouseId().intValue())
                 .orElseThrow(() -> new EntityNotFoundException("Warehouse not found with id: " + request.getWarehouseId()));
         
+        // Giả định một employee mặc định để xử lý đơn hàng
         Employee handledBy = employeeRepository.findById(1)
                .orElseThrow(() -> new EntityNotFoundException("Employee not found"));
 
@@ -63,14 +83,14 @@ public class OrderServiceImpl implements OrderService {
                     .order(order)
                     .variant(variant)
                     .quantity(itemDto.getQuantity())
-                    .unitPrice(itemDto.getUnitPrice())
+                    .priceAtPurchase(itemDto.getUnitPrice())
                     .build();
         }).collect(Collectors.toList());
 
         order.setItems(items);
         
         BigDecimal grandTotal = items.stream()
-                .map(item -> item.getUnitPrice().multiply(new BigDecimal(item.getQuantity())))
+                .map(item -> item.getPriceAtPurchase().multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         order.setGrandTotal(grandTotal);
@@ -94,5 +114,12 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new EntityNotFoundException("Order not found with id: " + orderId));
         order.setStatus(newStatus);
         orderRepository.save(order);
+    }
+
+    @Override
+    public List<OrderResponse> findAllOrders() {
+        return orderRepository.findAll().stream()
+                .map(orderMapper::toDto)
+                .collect(Collectors.toList());
     }
 }

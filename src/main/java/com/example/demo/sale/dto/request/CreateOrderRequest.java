@@ -2,13 +2,12 @@ package com.example.demo.sale.dto.request;
 
 import lombok.Data;
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
 import java.util.List;
 
 @Data
 public class CreateOrderRequest {
     private Long customerId;
-    private Long warehouseId;
+    private Integer warehouseId;
     private String shippingAddress;
     private List<ItemRequest> items;
 
@@ -16,5 +15,6 @@ public class CreateOrderRequest {
     public static class ItemRequest {
         private Long variantId;
         private Integer quantity;
+        private BigDecimal unitPrice;
     }
 }

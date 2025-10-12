@@ -28,6 +28,6 @@ public class OrderItem {
     @Column(nullable = false)
     private Integer quantity;
 
-    @Column(name = "price_at_purchase", nullable = false, precision = 18, 2)
-    private BigDecimal unitPrice; // Đổi tên từ price_at_purchase sang unitPrice cho dễ hiểu
+    @Column(name = "price_at_purchase", nullable = false, precision = 18, scale = 2)
+    private BigDecimal priceAtPurchase;
 }

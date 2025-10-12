@@ -7,6 +7,7 @@ import java.util.List;
 public class CreateReturnRequest {
     private Long orderId;
     private String reason;
+    private Integer createdByEmployeeId;
     private List<ReturnItemRequest> items;
 
     @Data

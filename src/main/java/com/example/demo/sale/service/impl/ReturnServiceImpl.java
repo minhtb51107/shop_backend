@@ -30,6 +30,28 @@ public class ReturnServiceImpl implements ReturnService {
     @Override
     @Transactional
     public ReturnResponse createReturn(CreateReturnRequest request) {
+        // Manual Validation
+        if (request.getOrderId() == null) {
+            throw new IllegalArgumentException("Order ID must not be null.");
+        }
+        if (request.getReason() == null || request.getReason().trim().isEmpty()) {
+            throw new IllegalArgumentException("Reason must not be empty.");
+        }
+        if (request.getCreatedByEmployeeId() == null) {
+            throw new IllegalArgumentException("Created By Employee ID must not be null.");
+        }
+        if (request.getItems() == null || request.getItems().isEmpty()) {
+            throw new IllegalArgumentException("Return must contain at least one item.");
+        }
+        for (CreateReturnRequest.ReturnItemRequest item : request.getItems()) {
+            if (item.getOrderItemId() == null) {
+                throw new IllegalArgumentException("Return item's order item ID must not be null.");
+            }
+            if (item.getQuantity() == null || item.getQuantity() <= 0) {
+                throw new IllegalArgumentException("Return item quantity must be a positive number.");
+            }
+        }
+
         Return returnEntity = returnMapper.toEntity(request);
         
         returnEntity.setOrder(orderRepository.findById(request.getOrderId())
@@ -54,5 +76,19 @@ public class ReturnServiceImpl implements ReturnService {
 
         Return savedReturn = returnRepository.save(returnEntity);
         return returnMapper.toDto(savedReturn);
+    }
+
+    @Override
+    public ReturnResponse getReturnById(Long id) {
+        Return returnEntity = returnRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Return not found with id: " + id));
+        return returnMapper.toDto(returnEntity);
+    }
+
+    @Override
+    public List<ReturnResponse> findAllReturns() {
+        return returnRepository.findAll().stream()
+                .map(returnMapper::toDto)
+                .collect(Collectors.toList());
     }
 }

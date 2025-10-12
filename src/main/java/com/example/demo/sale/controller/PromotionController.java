@@ -2,7 +2,7 @@ package com.example.demo.sale.controller;
 
 import com.example.demo.sale.dto.request.CreatePromotionRequest;
 import com.example.demo.sale.dto.response.PromotionResponse;
-import com.example.demo.sale.service.PromotionService; // Giả định bạn có PromotionService
+import com.example.demo.sale.service.PromotionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

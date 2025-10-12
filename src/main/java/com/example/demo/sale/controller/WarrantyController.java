@@ -2,7 +2,7 @@ package com.example.demo.sale.controller;
 
 import com.example.demo.sale.dto.request.CreateWarrantyCaseRequest;
 import com.example.demo.sale.dto.response.WarrantyCaseResponse;
-import com.example.demo.sale.service.WarrantyService; // Giả định bạn có WarrantyService
+import com.example.demo.sale.service.WarrantyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

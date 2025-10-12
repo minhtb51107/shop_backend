@@ -5,4 +5,5 @@ import com.example.demo.sale.dto.response.PaymentResponse;
 
 public interface PaymentService {
     PaymentResponse createPayment(CreatePaymentRequest request);
+    PaymentResponse getPaymentById(Long id);
 }
