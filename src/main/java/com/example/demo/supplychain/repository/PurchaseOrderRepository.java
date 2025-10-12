@@ -14,4 +14,5 @@ public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder, In
 
     // Tìm các đơn hàng theo trạng thái và có phân trang
     Page<PurchaseOrder> findByStatus(PurchaseOrderStatus status, Pageable pageable);
+
 }
