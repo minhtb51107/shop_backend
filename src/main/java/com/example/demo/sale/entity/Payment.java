@@ -2,7 +2,6 @@ package com.example.demo.sale.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.math.BigDecimal;
 
 @Getter
@@ -17,7 +16,7 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
@@ -30,6 +29,6 @@ public class Payment {
     @Column(name = "status", nullable = false, length = 50)
     private String status;
 
-    @Column(name = "transaction_code")
+    @Column(name = "transaction_code", length = 255)
     private String transactionCode;
 }

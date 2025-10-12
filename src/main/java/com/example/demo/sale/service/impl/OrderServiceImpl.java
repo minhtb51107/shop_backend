@@ -9,15 +9,20 @@ import com.example.demo.sale.entity.OrderItem;
 import com.example.demo.sale.mapper.OrderMapper;
 import com.example.demo.sale.repository.OrderRepository;
 import com.example.demo.sale.service.OrderService;
+import com.example.demo.user.entity.Customer;
 import com.example.demo.user.repository.CustomerRepository;
+import com.example.demo.user.entity.Employee;
+import com.example.demo.user.repository.EmployeeRepository;
+import com.example.demo.supplychain.entity.Warehouse;
 import com.example.demo.supplychain.repository.WarehouseRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,57 +30,68 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final CustomerRepository customerRepository;
-    private final VariantRepository productVariantRepository;
+    private final VariantRepository variantRepository;
     private final WarehouseRepository warehouseRepository;
+    private final EmployeeRepository employeeRepository;
     private final OrderMapper orderMapper;
 
     @Override
     @Transactional
     public OrderResponse createOrder(CreateOrderRequest request) {
+        Customer customer = customerRepository.findById(request.getCustomerId().intValue())
+                .orElseThrow(() -> new EntityNotFoundException("Customer not found with id: " + request.getCustomerId()));
+        
+        Warehouse warehouse = warehouseRepository.findById(request.getWarehouseId().intValue())
+                .orElseThrow(() -> new EntityNotFoundException("Warehouse not found with id: " + request.getWarehouseId()));
+        
+        Employee handledBy = employeeRepository.findById(1)
+               .orElseThrow(() -> new EntityNotFoundException("Employee not found"));
+
         Order order = new Order();
-        order.setCustomer(customerRepository.findById(request.getCustomerId().intValue()).orElseThrow());
-        order.setWarehouse(warehouseRepository.findById(request.getWarehouseId().intValue()).orElseThrow());
+        order.setCustomer(customer);
+        order.setWarehouse(warehouse);
         order.setShippingAddress(request.getShippingAddress());
         order.setCreatedAt(OffsetDateTime.now());
         order.setStatus("PENDING");
-        Set<OrderItem> items = request.getItems().stream().map(itemDto -> {
-            OrderItem item = new OrderItem();
-            item.setOrder(order);
-            item.setQuantity(itemDto.getQuantity());
+        order.setHandledBy(handledBy);
 
-            // Lưu đối tượng ProductVariant đã tìm được vào một biến tạm thời
-            ProductVariant variant = productVariantRepository.findById(itemDto.getVariantId().longValue()).orElseThrow();
+        List<OrderItem> items = request.getItems().stream().map(itemDto -> {
+            ProductVariant variant = variantRepository.findById(itemDto.getVariantId())
+                    .orElseThrow(() -> new EntityNotFoundException("Product Variant not found with id: " + itemDto.getVariantId()));
             
-            // Sử dụng biến tạm thời để gán cho item
-            item.setVariant(variant);
-            
-            // Sử dụng biến tạm thời để lấy giá
-            item.setPriceAtPurchase(variant.getPrice());
-            
-            return item;
-        }).collect(Collectors.toSet());
+            return OrderItem.builder()
+                    .order(order)
+                    .variant(variant)
+                    .quantity(itemDto.getQuantity())
+                    .unitPrice(itemDto.getUnitPrice())
+                    .build();
+        }).collect(Collectors.toList());
 
+        order.setItems(items);
+        
         BigDecimal grandTotal = items.stream()
-                .map(item -> item.getPriceAtPurchase().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .map(item -> item.getUnitPrice().multiply(new BigDecimal(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         order.setGrandTotal(grandTotal);
-        order.setItems(items);
         
         Order savedOrder = orderRepository.save(order);
         return orderMapper.toDto(savedOrder);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public OrderResponse getOrderById(Long orderId) {
-        Order order = orderRepository.findById(orderId).orElseThrow();
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new EntityNotFoundException("Order not found with id: " + orderId));
         return orderMapper.toDto(order);
     }
 
     @Override
     @Transactional
     public void updateOrderStatus(Long orderId, String newStatus) {
-        Order order = orderRepository.findById(orderId).orElseThrow();
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new EntityNotFoundException("Order not found with id: " + orderId));
         order.setStatus(newStatus);
         orderRepository.save(order);
     }

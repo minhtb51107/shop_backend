@@ -1,13 +1,13 @@
 package com.example.demo.sale.dto.response;
 
 import lombok.Data;
-import java.util.List;
+import java.time.OffsetDateTime;
 
 @Data
-public class ReturnResponse {
+public class ShipmentResponse {
     private Long id;
     private Long orderId;
-    private String reason;
+    private String trackingCode;
     private String status;
-    private List<ReturnItemResponse> items;
+    private OffsetDateTime shippedAt;
 }

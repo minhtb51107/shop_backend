@@ -3,8 +3,7 @@ package com.example.demo.sale.entity;
 import com.example.demo.user.entity.Employee;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -22,7 +21,7 @@ public class Return {
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-    @Column(name = "reason", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "reason", columnDefinition = "TEXT", nullable = false)
     private String reason;
 
     @Column(name = "status", nullable = false, length = 50)
@@ -32,6 +31,6 @@ public class Return {
     @JoinColumn(name = "created_by_employee_id")
     private Employee createdBy;
 
-    @OneToMany(mappedBy = "returnRequest", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<ReturnItem> items;
+    @OneToMany(mappedBy = "return", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReturnItem> items;
 }

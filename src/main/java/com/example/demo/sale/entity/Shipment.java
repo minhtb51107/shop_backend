@@ -2,7 +2,6 @@ package com.example.demo.sale.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.OffsetDateTime;
 
 @Getter

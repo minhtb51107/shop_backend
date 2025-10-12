@@ -17,7 +17,7 @@ public class WarrantyCase {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_item_id", nullable = false)
     private OrderItem orderItem;
 

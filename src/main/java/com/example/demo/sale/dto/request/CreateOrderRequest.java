@@ -1,26 +1,19 @@
 package com.example.demo.sale.dto.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class CreateOrderRequest {
     private Long customerId;
     private Long warehouseId;
     private String shippingAddress;
-    private List<OrderItemRequest> items;
+    private List<ItemRequest> items;
 
     @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class OrderItemRequest {
+    public static class ItemRequest {
         private Long variantId;
         private Integer quantity;
     }

@@ -1,13 +1,13 @@
 package com.example.demo.sale.entity;
-import com.example.demo.supplychain.entity.Warehouse;
+
 import com.example.demo.user.entity.Customer;
+import com.example.demo.supplychain.entity.Warehouse;
 import com.example.demo.user.entity.Employee;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -25,12 +25,12 @@ public class Order {
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
-    @Column(name = "shipping_address", columnDefinition = "TEXT")
-    private String shippingAddress;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "warehouse_id")
     private Warehouse warehouse;
+
+    @Column(name = "shipping_address", columnDefinition = "TEXT")
+    private String shippingAddress;
 
     @Column(name = "grand_total", nullable = false, precision = 18, scale = 2)
     private BigDecimal grandTotal;
@@ -46,14 +46,14 @@ public class Order {
     private Employee handledBy;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<OrderItem> items;
+    private List<OrderItem> items;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<OrderStatusHistory> statusHistories;
+    private List<OrderStatusHistory> statusHistories;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<PromotionAppliedOrder> appliedPromotions;
+    private List<PromotionAppliedOrder> appliedPromotions;
 
-    @OneToMany(mappedBy = "order")
-    private Set<Shipment> shipments;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Shipment> shipments;
 }

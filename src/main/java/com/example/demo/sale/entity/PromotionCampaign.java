@@ -2,10 +2,8 @@ package com.example.demo.sale.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -19,7 +17,7 @@ public class PromotionCampaign {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, length = 255)
     private String name;
 
     @Column(name = "start_date")
@@ -34,9 +32,6 @@ public class PromotionCampaign {
     @Column(name = "discount_value", nullable = false, precision = 18, scale = 2)
     private BigDecimal discountValue;
 
-    @Column(name = "is_active")
+    @Column(name = "is_active", nullable = false)
     private Boolean isActive;
-
-    @OneToMany(mappedBy = "campaign")
-    private Set<PromotionAppliedOrder> appliedOrders;
 }

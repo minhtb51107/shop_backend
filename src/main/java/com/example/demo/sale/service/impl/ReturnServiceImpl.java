@@ -10,11 +10,12 @@ import com.example.demo.sale.repository.OrderRepository;
 import com.example.demo.sale.repository.ReturnRepository;
 import com.example.demo.sale.service.ReturnService;
 import com.example.demo.user.repository.EmployeeRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,18 +31,24 @@ public class ReturnServiceImpl implements ReturnService {
     @Transactional
     public ReturnResponse createReturn(CreateReturnRequest request) {
         Return returnEntity = returnMapper.toEntity(request);
-        returnEntity.setOrder(orderRepository.findById(request.getOrderId()).orElseThrow());
-        returnEntity.setCreatedBy(employeeRepository.findById(request.getCreatedByEmployeeId().intValue()).orElseThrow());
+        
+        returnEntity.setOrder(orderRepository.findById(request.getOrderId())
+                .orElseThrow(() -> new EntityNotFoundException("Order not found with id: " + request.getOrderId())));
+        
+        returnEntity.setCreatedBy(employeeRepository.findById(request.getCreatedByEmployeeId().intValue())
+                .orElseThrow(() -> new EntityNotFoundException("Employee not found with id: " + request.getCreatedByEmployeeId())));
+        
         returnEntity.setStatus("REQUESTED");
 
-        Set<ReturnItem> items = request.getItems().stream().map(itemDto -> {
+        List<ReturnItem> items = request.getItems().stream().map(itemDto -> {
             ReturnItem item = new ReturnItem();
-            item.setReturnRequest(returnEntity);
+            item.setReturned(returnEntity);
             item.setQuantity(itemDto.getQuantity());
             item.setReason(itemDto.getReason());
-            item.setOrderItem(orderItemRepository.findById(itemDto.getOrderItemId()).orElseThrow());
+            item.setOrderItem(orderItemRepository.findById(itemDto.getOrderItemId())
+                    .orElseThrow(() -> new EntityNotFoundException("Order item not found with id: " + itemDto.getOrderItemId())));
             return item;
-        }).collect(Collectors.toSet());
+        }).collect(Collectors.toList());
 
         returnEntity.setItems(items);
 

@@ -3,9 +3,7 @@ package com.example.demo.sale.entity;
 import com.example.demo.product.entity.ProductVariant;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.math.BigDecimal;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -27,9 +25,9 @@ public class OrderItem {
     @JoinColumn(name = "variant_id", nullable = false)
     private ProductVariant variant;
 
-    @Column(name = "quantity", nullable = false)
+    @Column(nullable = false)
     private Integer quantity;
 
-    @Column(name = "price_at_purchase", nullable = false, precision = 18, scale = 2)
-    private BigDecimal priceAtPurchase;
+    @Column(name = "price_at_purchase", nullable = false, precision = 18, 2)
+    private BigDecimal unitPrice; // Đổi tên từ price_at_purchase sang unitPrice cho dễ hiểu
 }

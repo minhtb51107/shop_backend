@@ -17,15 +17,15 @@ public class ReturnItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "return_id", nullable = false)
-    private Return returnRequest;
+    private Return returned;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_item_id", nullable = false)
     private OrderItem orderItem;
 
-    @Column(name = "quantity", nullable = false)
+    @Column(nullable = false)
     private Integer quantity;
 
-    @Column(name = "reason", columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT")
     private String reason;
 }

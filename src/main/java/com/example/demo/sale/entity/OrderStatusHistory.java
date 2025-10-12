@@ -3,7 +3,6 @@ package com.example.demo.sale.entity;
 import com.example.demo.user.entity.Employee;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.OffsetDateTime;
 
 @Getter

@@ -9,6 +9,7 @@ import com.example.demo.sale.repository.WarrantyCaseRepository;
 import com.example.demo.sale.service.WarrantyService;
 import com.example.demo.user.repository.CustomerRepository;
 import com.example.demo.user.repository.EmployeeRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,9 +27,16 @@ public class WarrantyServiceImpl implements WarrantyService {
     @Transactional
     public WarrantyCaseResponse createWarrantyCase(CreateWarrantyCaseRequest request) {
         WarrantyCase warrantyCase = warrantyMapper.toEntity(request);
-        warrantyCase.setOrderItem(orderItemRepository.findById(request.getOrderItemId()).orElseThrow());
-        warrantyCase.setCustomer(customerRepository.findById(request.getCustomerId().intValue()).orElseThrow());
-        warrantyCase.setCreatedBy(employeeRepository.findById(request.getCreatedByEmployeeId().intValue()).orElseThrow());
+        
+        warrantyCase.setOrderItem(orderItemRepository.findById(request.getOrderItemId())
+                .orElseThrow(() -> new EntityNotFoundException("Order item not found with id: " + request.getOrderItemId())));
+        
+        warrantyCase.setCustomer(customerRepository.findById(request.getCustomerId().intValue())
+                .orElseThrow(() -> new EntityNotFoundException("Customer not found with id: " + request.getCustomerId())));
+        
+        warrantyCase.setCreatedBy(employeeRepository.findById(request.getCreatedByEmployeeId().intValue())
+                .orElseThrow(() -> new EntityNotFoundException("Employee not found with id: " + request.getCreatedByEmployeeId())));
+        
         warrantyCase.setStatus("RECEIVED");
 
         WarrantyCase savedCase = warrantyCaseRepository.save(warrantyCase);

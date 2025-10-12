@@ -1,35 +1,35 @@
 package com.example.demo.product.entity;
+
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.Builder.Default;
 
-@Entity
-@Table(name = "products")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@Entity
+@Table(name = "products")
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "brand_id")
-    private Brand brand;
-
-    @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
-    private ProductCategory category;
-
     @Column(nullable = false)
     private String name;
 
-    @Column(unique = true)
+    @Column(name = "sku_prefix", unique = true, length = 50)
     private String skuPrefix;
 
+    @Column(columnDefinition = "TEXT")
     private String description;
 
-    private Boolean isActive = true;
+    @Default
+    @Column(name = "is_active")
+    private boolean isActive = true;
 
-    private Boolean isDeleted = false;
+    @Default
+    @Column(name = "is_deleted")
+    private boolean isDeleted = false;
 }
-
