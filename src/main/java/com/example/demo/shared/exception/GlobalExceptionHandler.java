@@ -1,5 +1,7 @@
 package com.example.demo.shared.exception;
 
+import com.example.demo.finance.exception.AccountInactiveException;
+import com.example.demo.finance.exception.PeriodClosedException;
 import com.example.demo.shared.dto.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -73,5 +75,17 @@ public class GlobalExceptionHandler {
                 .path(request.getRequestURI())
                 .build();
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+    
+    // PHẦN ĐƯỢC THÊM VÀO TỪ FILE KIA
+    @ExceptionHandler({PeriodClosedException.class, AccountInactiveException.class, IllegalStateException.class})
+    public ResponseEntity<Object> handleBusinessException(RuntimeException ex) {
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .timestamp(OffsetDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Bad Request")
+                .message(ex.getMessage())
+                .build();
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 }

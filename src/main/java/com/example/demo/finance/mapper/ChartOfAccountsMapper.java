@@ -2,16 +2,36 @@ package com.example.demo.finance.mapper;
 
 import com.example.demo.finance.dto.response.AccountResponse;
 import com.example.demo.finance.entity.ChartOfAccounts;
-import org.mapstruct.Mapper;
+import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring") // Báo cho MapStruct tạo ra một Spring Bean
-public interface ChartOfAccountsMapper {
+@Component // Chuyển thành Spring Component
+public class ChartOfAccountsMapper {
 
-    // Tự động chuyển 1 Entity sang 1 DTO
-    AccountResponse toResponse(ChartOfAccounts entity);
+    // Triển khai thủ công phương thức toResponse
+    public AccountResponse toResponse(ChartOfAccounts entity) {
+        if (entity == null) {
+            return null;
+        }
+        AccountResponse response = new AccountResponse();
+        response.setId(entity.getId());
+        response.setAccountCode(entity.getAccountCode());
+        response.setAccountName(entity.getAccountName());
+        response.setAccountType(entity.getAccountType());
+        response.setIsActive(entity.getIsActive());
+        return response;
+    }
 
-    // Tự động chuyển 1 List Entity sang 1 List DTO
-    List<AccountResponse> toResponseList(List<ChartOfAccounts> entities);
+    // Triển khai thủ công phương thức toResponseList
+    public List<AccountResponse> toResponseList(List<ChartOfAccounts> entities) {
+        if (entities == null || entities.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return entities.stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
 }

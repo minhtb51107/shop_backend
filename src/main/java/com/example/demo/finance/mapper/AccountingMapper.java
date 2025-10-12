@@ -3,18 +3,40 @@ package com.example.demo.finance.mapper;
 import com.example.demo.finance.dto.response.JournalEntryResponse;
 import com.example.demo.finance.entity.JournalEntry;
 import com.example.demo.finance.entity.JournalEntryItem;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.springframework.stereotype.Component;
 
-@Mapper(componentModel = "spring")
-public interface AccountingMapper {
+import java.util.stream.Collectors;
 
-    // Định nghĩa cách chuyển từ JournalEntry -> JournalEntryResponse
-    JournalEntryResponse toJournalEntryResponse(JournalEntry entity);
+@Component // Chuyển thành Spring Component
+public class AccountingMapper {
 
-    // Định nghĩa cách chuyển từ JournalEntryItem -> JournalEntryItemResponse
-    // MapStruct sẽ tự biết lấy accountCode và accountName từ đối tượng account bên trong
-    @Mapping(source = "account.accountCode", target = "accountCode")
-    @Mapping(source = "account.accountName", target = "accountName")
-    JournalEntryResponse.JournalEntryItemResponse toJournalEntryItemResponse(JournalEntryItem item);
+    // Triển khai thủ công phương thức toJournalEntryResponse
+    public JournalEntryResponse toJournalEntryResponse(JournalEntry entity) {
+        if (entity == null) {
+            return null;
+        }
+
+        return JournalEntryResponse.builder()
+                .id(entity.getId())
+                .description(entity.getDescription())
+                .transactionDate(entity.getTransactionDate())
+                .items(entity.getItems().stream()
+                        .map(this::toJournalEntryItemResponse) // Gọi phương thức con
+                        .collect(Collectors.toList()))
+                .build();
+    }
+
+    // Triển khai thủ công phương thức toJournalEntryItemResponse
+    public JournalEntryResponse.JournalEntryItemResponse toJournalEntryItemResponse(JournalEntryItem item) {
+        if (item == null) {
+            return null;
+        }
+
+        return JournalEntryResponse.JournalEntryItemResponse.builder()
+                .accountCode(item.getAccount() != null ? item.getAccount().getAccountCode() : null)
+                .accountName(item.getAccount() != null ? item.getAccount().getAccountName() : null)
+                .debit(item.getDebit())
+                .credit(item.getCredit())
+                .build();
+    }
 }
