@@ -1,7 +1,7 @@
 package com.example.demo.supplychain.controller;
 
 import com.example.demo.supplychain.entity.Warehouse;
-import com.example.demo.supplychain.repository.WarehouseRepository;
+import com.example.demo.supplychain.service.WarehouseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,44 +14,45 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class WarehouseController {
 
-    private final WarehouseRepository warehouseRepository;
+    private final WarehouseService warehouseService;
 
     @GetMapping
     public ResponseEntity<List<Warehouse>> getAllWarehouses() {
-        List<Warehouse> warehouses = warehouseRepository.findAll();
+        List<Warehouse> warehouses = warehouseService.getAllWarehouses();
         return ResponseEntity.ok(warehouses);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Warehouse> getWarehouseById(@PathVariable Integer id) {
-        Optional<Warehouse> warehouse = warehouseRepository.findById(id);
+        Optional<Warehouse> warehouse = warehouseService.getWarehouseById(id);
         return warehouse.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
     public ResponseEntity<Warehouse> createWarehouse(@RequestBody Warehouse warehouse) {
-        Warehouse savedWarehouse = warehouseRepository.save(warehouse);
+        Warehouse savedWarehouse = warehouseService.createWarehouse(warehouse);
         return ResponseEntity.ok(savedWarehouse);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Warehouse> updateWarehouse(@PathVariable Integer id, @RequestBody Warehouse warehouse) {
-        if (!warehouseRepository.existsById(id)) {
+        try {
+            Warehouse updatedWarehouse = warehouseService.updateWarehouse(id, warehouse);
+            return ResponseEntity.ok(updatedWarehouse);
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
-        warehouse.setId(id);
-        Warehouse updatedWarehouse = warehouseRepository.save(warehouse);
-        return ResponseEntity.ok(updatedWarehouse);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteWarehouse(@PathVariable Integer id) {
-        if (!warehouseRepository.existsById(id)) {
+        try {
+            warehouseService.deleteWarehouse(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
-        warehouseRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/web")
@@ -61,7 +62,7 @@ public class WarehouseController {
 
     @GetMapping("/search/name")
     public ResponseEntity<List<Warehouse>> searchWarehousesByName(@RequestParam String name) {
-        List<Warehouse> warehouses = warehouseRepository.findAll();
+        List<Warehouse> warehouses = warehouseService.getAllWarehouses();
         // Simple name filtering - in real app, use proper query
         List<Warehouse> filtered = warehouses.stream()
                 .filter(w -> w.getName() != null && w.getName().contains(name))
@@ -71,7 +72,7 @@ public class WarehouseController {
 
     @GetMapping("/search/address")
     public ResponseEntity<List<Warehouse>> searchWarehousesByAddress(@RequestParam String address) {
-        List<Warehouse> warehouses = warehouseRepository.findAll();
+        List<Warehouse> warehouses = warehouseService.getAllWarehouses();
         // Simple address filtering - in real app, use proper query
         List<Warehouse> filtered = warehouses.stream()
                 .filter(w -> w.getAddress() != null && w.getAddress().contains(address))
