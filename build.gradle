@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.5.6'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id "com.diffplug.eclipse.apt" version "3.36.1"
 }
 
 group = 'com.example'
@@ -25,6 +26,11 @@ repositories {
 }
 
 dependencies {
+	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+
+	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
 	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -39,8 +45,17 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testImplementation 'org.mockito:mockito-core:4.8.0'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+eclipse {
+    jdt {
+        apt {
+            genSrcDir = file("build/generated/sources/annotationProcessor/java/main")
+        }
+    }
 }
