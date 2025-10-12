@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.shared.exception.BadRequestException;
 import com.example.demo.shared.exception.ResourceNotFoundException;
+import com.example.demo.user.dto.request.AssignRolesToEmployeeRequest;
 import com.example.demo.user.dto.request.CreateEmployeeRequest;
 import com.example.demo.user.dto.request.UpdateEmployeeRequest;
 import com.example.demo.user.dto.response.EmployeeResponse;
@@ -37,33 +38,39 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeMapper employeeMapper;
     private final PasswordEncoder passwordEncoder;
 
+ // Version đã sửa lỗi
     @Override
     public EmployeeResponse createEmployee(CreateEmployeeRequest request) {
-        // 1. Validate
+        // 1. Validate (Giữ nguyên)
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new BadRequestException("Email đã được sử dụng.");
         }
         
-        // 2. Tìm các Role từ CSDL
+        // 2. Tìm các Role từ CSDL (Giữ nguyên)
         Set<Role> roles = request.getRoleNames().stream()
                 .map(roleName -> roleRepository.findByName(roleName)
                         .orElseThrow(() -> new BadRequestException("Vai trò không hợp lệ: " + roleName)))
                 .collect(Collectors.toSet());
 
-        // 3. Tạo User
+        // 3. Tạo User (Giữ nguyên)
         User user = new User();
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setStatus(UserStatus.ACTIVE);
 
-        // 4. Tạo Employee, liên kết User và Roles
+        // 4. Tạo Employee (Giữ nguyên)
         Employee employee = employeeMapper.toEmployeeEntity(request);
-        employee.setUser(user);
-        employee.setRoles(roles);
+        
+        // 5. *** THAY ĐỔI QUAN TRỌNG: Thiết lập quan hệ 2 chiều ***
+        employee.setUser(user);      // Employee biết về User
+        employee.setRoles(roles);    // Employee biết về Roles
+        user.setEmployee(employee);  // User cũng phải biết về Employee
 
-        // 5. Lưu vào CSDL và trả về response
-        Employee savedEmployee = employeeRepository.save(employee);
-        return employeeMapper.toEmployeeResponse(savedEmployee);
+        // 6. *** THAY ĐỔI QUAN TRỌNG: Lưu User thay vì Employee ***
+        User savedUser = userRepository.save(user);
+
+        // 7. *** THAY ĐỔI QUAN TRỌNG: Trả về response từ đối tượng đã lưu ***
+        return employeeMapper.toEmployeeResponse(savedUser.getEmployee());
     }
     
     @Override
@@ -106,5 +113,27 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy nhân viên với ID: " + id));
         employee.setActive(isActive);
         employeeRepository.save(employee);
+    }
+    
+    @Override
+    public EmployeeResponse assignRolesToEmployee(Integer employeeId, AssignRolesToEmployeeRequest request) {
+        // 1. Tìm nhân viên trong CSDL
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy nhân viên với ID: " + employeeId));
+
+        // 2. Tìm tất cả các đối tượng Role hợp lệ từ danh sách tên vai trò
+        Set<Role> roles = request.getRoleNames().stream()
+                .map(roleName -> roleRepository.findByName(roleName)
+                        .orElseThrow(() -> new BadRequestException("Tên vai trò không hợp lệ: " + roleName)))
+                .collect(Collectors.toSet());
+
+        // 3. Cập nhật lại danh sách vai trò cho nhân viên
+        employee.setRoles(roles);
+
+        // 4. Lưu lại thông tin nhân viên đã được cập nhật
+        Employee updatedEmployee = employeeRepository.save(employee);
+
+        // 5. Trả về thông tin nhân viên dưới dạng DTO
+        return employeeMapper.toEmployeeResponse(updatedEmployee);
     }
 }

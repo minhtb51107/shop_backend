@@ -16,6 +16,7 @@ import com.example.demo.user.dto.response.RoleWithPermissionsResponse;
 import com.example.demo.user.entity.Permission;
 import com.example.demo.user.entity.Role;
 import com.example.demo.user.mapper.RoleMapper;
+import com.example.demo.user.repository.EmployeeRepository;
 import com.example.demo.user.repository.PermissionRepository;
 import com.example.demo.user.repository.RoleRepository;
 import com.example.demo.user.service.RoleService;
@@ -30,6 +31,7 @@ public class RoleServiceImpl implements RoleService {
     private final RoleRepository roleRepository;
     private final PermissionRepository permissionRepository;
     private final RoleMapper roleMapper;
+    private final EmployeeRepository employeeRepository; // <-- THÊM DEPENDENCY
 
     @Override
     public RoleWithPermissionsResponse createRole(CreateRoleRequest request) {
@@ -71,6 +73,23 @@ public class RoleServiceImpl implements RoleService {
         Role updatedRole = roleRepository.save(role);
 
         return roleMapper.toRoleWithPermissionsResponse(updatedRole);
+    }
+    
+    @Override
+    public void deleteRole(Integer roleId) {
+        // 1. Kiểm tra vai trò có tồn tại không
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy vai trò với ID: " + roleId));
+        
+        // 2. *** KIỂM TRA RÀNG BUỘC (CẢI TIẾN MỚI) ***
+        // Kiểm tra xem có nhân viên nào đang giữ vai trò này không
+        long employeesCount = employeeRepository.countByRoles_Id(roleId);
+        if (employeesCount > 0) {
+            throw new BadRequestException("Không thể xóa vai trò '" + role.getName() + "' vì nó đang được gán cho " + employeesCount + " nhân viên.");
+        }
+
+        // 3. Xóa vai trò
+        roleRepository.deleteById(roleId);
     }
 }
 

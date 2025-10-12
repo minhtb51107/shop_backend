@@ -17,7 +17,7 @@ public class Customer {
     private Integer id;
 
     // Quan hệ 1-1, user_id là khóa ngoại và là duy nhất
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL) // <-- THÊM CASCADE VÀO ĐÂY
+    @OneToOne(fetch = FetchType.LAZY) // <-- XÓA BỎ cascade = CascadeType.ALL
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, unique = true)
     private User user;
 

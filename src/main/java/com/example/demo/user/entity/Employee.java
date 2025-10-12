@@ -21,7 +21,7 @@ public class Employee {
     @Column(name = "employee_code", nullable = false, unique = true, length = 20)
     private String employeeCode;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL) // <-- THÊM CASCADE VÀO ĐÂY
+    @OneToOne(fetch = FetchType.LAZY) // <-- XÓA BỎ cascade = CascadeType.ALL
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, unique = true)
     private User user;
 

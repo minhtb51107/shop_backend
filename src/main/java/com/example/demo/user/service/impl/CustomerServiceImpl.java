@@ -10,8 +10,11 @@ import com.example.demo.shared.exception.ResourceNotFoundException;
 import com.example.demo.user.dto.request.UpdateCustomerRequest;
 import com.example.demo.user.dto.response.CustomerResponse;
 import com.example.demo.user.entity.Customer;
+import com.example.demo.user.entity.User;
+import com.example.demo.user.entity.UserStatus;
 import com.example.demo.user.mapper.CustomerMapper;
 import com.example.demo.user.repository.CustomerRepository;
+import com.example.demo.user.repository.UserRepository;
 import com.example.demo.user.service.CustomerService;
 
 import lombok.RequiredArgsConstructor;
@@ -23,6 +26,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
+    private final UserRepository userRepository; // <-- THÊM DEPENDENCY NÀY
 
     @Override
     public CustomerResponse getCustomerById(Integer id) {
@@ -63,12 +67,21 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    @Transactional // Đảm bảo đây là một transaction ghi
     public void deleteCustomer(Integer id) {
-        if (!customerRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Không tìm thấy khách hàng với ID: " + id);
+        // 1. Tìm Customer
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy khách hàng với ID: " + id));
+
+        // 2. Lấy User liên quan và khóa tài khoản
+        User user = customer.getUser();
+        if (user != null) {
+            user.setStatus(UserStatus.SUSPENDED); // Đổi trạng thái thành bị khóa
+            userRepository.save(user);
         }
-        // Lưu ý: Do có ràng buộc khóa ngoại CASCADE trên bảng `users`,
-        // việc xóa customer có thể sẽ xóa cả user nếu được cấu hình. Cần cẩn thận.
-        customerRepository.deleteById(id);
+
+        // 3. Xóa Customer (nhưng không xóa User)
+        // Hành động này an toàn vì chúng ta đã gỡ bỏ Cascade
+        customerRepository.delete(customer);
     }
 }

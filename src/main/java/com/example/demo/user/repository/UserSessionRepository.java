@@ -27,4 +27,20 @@ public interface UserSessionRepository extends JpaRepository<UserSession, UUID> 
      */
     @Modifying // Báo cho Spring biết đây là một query thay đổi dữ liệu (DELETE/UPDATE)
     void deleteAllByExpiresAtBefore(OffsetDateTime now);
+    
+    // --- CÁC PHƯƠNG THỨC MỚI ĐƯỢC THÊM VÀO ---
+
+    /**
+     * Đếm số lượng session đang hoạt động của một người dùng.
+     * @param userId ID của người dùng.
+     * @return Số lượng session.
+     */
+    long countByUserId(Integer userId);
+
+    /**
+     * Tìm session cũ nhất (dựa trên thời gian tạo) của một người dùng.
+     * @param userId ID của người dùng.
+     * @return Optional chứa session cũ nhất nếu có.
+     */
+    Optional<UserSession> findFirstByUserIdOrderByCreatedAtAsc(Integer userId);
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,5 +47,11 @@ public class RoleController {
             @Valid @RequestBody AssignPermissionToRoleRequest request) {
         RoleWithPermissionsResponse updatedRole = roleService.assignPermissionsToRole(roleId, request);
         return ResponseEntity.ok(updatedRole);
+    }
+    
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteRole(@PathVariable("id") Integer roleId) {
+        roleService.deleteRole(roleId);
+        return ResponseEntity.noContent().build();
     }
 }

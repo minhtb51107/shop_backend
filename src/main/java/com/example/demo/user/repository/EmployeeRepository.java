@@ -38,4 +38,11 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
      * @return List các Employee theo trạng thái.
      */
     List<Employee> findByActive(boolean isActive);
+    
+    /**
+     * Đếm số lượng nhân viên có một vai trò cụ thể.
+     * @param roleId ID của vai trò cần kiểm tra.
+     * @return Số lượng nhân viên đang có vai trò này.
+     */
+    long countByRoles_Id(Integer roleId);
 }

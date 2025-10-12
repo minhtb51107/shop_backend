@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.user.dto.request.AssignRolesToEmployeeRequest;
 import com.example.demo.user.dto.request.CreateEmployeeRequest;
 import com.example.demo.user.dto.request.UpdateEmployeeRequest;
 import com.example.demo.user.dto.response.EmployeeResponse;
@@ -72,5 +73,14 @@ public class EmployeeController {
         // Cần thêm phương thức updateEmployeeStatus(id, isActive) vào EmployeeService
         employeeService.updateEmployeeStatus(id, isActive);
         return ResponseEntity.ok("Cập nhật trạng thái nhân viên thành công.");
+    }
+    
+    @PostMapping("/{id}/roles")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<EmployeeResponse> assignRolesToEmployee(
+            @PathVariable("id") Integer employeeId,
+            @Valid @RequestBody AssignRolesToEmployeeRequest request) {
+        EmployeeResponse updatedEmployee = employeeService.assignRolesToEmployee(employeeId, request);
+        return ResponseEntity.ok(updatedEmployee);
     }
 }

@@ -2,7 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.5.6'
 	id 'io.spring.dependency-management' version '1.1.7'
-	id 'eclipse' // <-- THÊM DÒNG NÀY VÀO
+	id 'eclipse'
 }
 
 group = 'com.example'
@@ -64,24 +64,26 @@ dependencies {
 	testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
     
-    // ✅ JUnit 5
+    // JUnit 5
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
 
-    // ✅ Mockito
-    // https://mvnrepository.com/artifact/org.mockito/mockito-core
+    // Mockito
 	testImplementation("org.mockito:mockito-core:5.18.0")
-
-    // ✅ Mockito hỗ trợ JUnit Jupiter (để dùng @ExtendWith(MockitoExtension.class))
     testImplementation 'org.mockito:mockito-junit-jupiter:5.11.0'
     
     implementation 'org.liquibase:liquibase-core'
     
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-    // SỬA LẠI DÒNG NÀY
-    implementation('com.google.api-client:google-api-client:2.2.0') {
-        exclude group: 'commons-logging', module: 'commons-logging'
-    }
+    
+	// Google API Client for OAuth2
+	implementation 'com.google.api-client:google-api-client:2.3.0'
+    implementation 'com.google.oauth-client:google-oauth-client-jetty:1.35.0'
+    implementation 'com.google.http-client:google-http-client-jackson2:1.45.1'
+    
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
 }
 
 tasks.named('test') {
@@ -92,14 +94,11 @@ tasks.named('test') {
 tasks.withType(JavaCompile).configureEach {
     options.getCompilerArgs().addAll([
             '-Amapstruct.defaultComponentModel=spring',
-			'-Amapstruct.unmappedTargetPolicy=IGNORE' // Bỏ qua cảnh báo nếu có trường không được map
+			'-Amapstruct.unmappedTargetPolicy=IGNORE'
     ])
 }
 
-// Thêm vào cuối file build.gradle
-
 // Cấu hình để Gradle tự động tạo file .classpath cho Eclipse/STS
-// Điều này sẽ giúp IDE nhận diện đúng các thư mục mã nguồn được sinh ra tự động
 eclipse {
     classpath {
         file {

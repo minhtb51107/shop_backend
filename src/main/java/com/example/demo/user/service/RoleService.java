@@ -29,4 +29,10 @@ public interface RoleService {
      * @return DTO của vai trò sau khi đã được cập nhật quyền.
      */
     RoleWithPermissionsResponse assignPermissionsToRole(Integer roleId, AssignPermissionToRoleRequest request);
+    
+    /**
+     * Xóa một vai trò khỏi hệ thống.
+     * @param roleId ID của vai trò cần xóa.
+     */
+    void deleteRole(Integer roleId);
 }
