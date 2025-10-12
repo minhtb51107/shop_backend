@@ -38,6 +38,9 @@ public class PromotionServiceImpl implements PromotionService {
         }
 
         PromotionCampaign campaign = promotionMapper.toEntity(request);
+        // THÊM DÒNG NÀY ĐỂ GÁN GIÁ TRỊ MẶC ĐỊNH
+        campaign.setIsActive(true); 
+
         PromotionCampaign savedCampaign = promotionCampaignRepository.save(campaign);
         return promotionMapper.toDto(savedCampaign);
     }
