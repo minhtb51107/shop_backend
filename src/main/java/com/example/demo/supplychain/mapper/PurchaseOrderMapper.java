@@ -1,61 +1,70 @@
-//// File: src/main/java/com/example/demo/supplychain/mapper/PurchaseOrderMapper.java
-//package com.example.demo.supplychain.mapper;
-//
-//import com.example.demo.supplychain.dto.response.PurchaseOrderDetailResponse;
-//import com.example.demo.supplychain.dto.response.PurchaseOrderSummaryResponse;
-//import com.example.demo.supplychain.entity.PurchaseOrder;
-////import com.example.demo.supplychain.entity.PurchaseOrderItem;
-//import org.mapstruct.AfterMapping;
-//import org.mapstruct.Mapper;
-//import org.mapstruct.Mapping;
-//import org.mapstruct.MappingTarget;
-//
-//import java.math.BigDecimal;
-//import java.util.List;
-//
-//@Mapper(componentModel = "spring")
-//public interface PurchaseOrderMapper {
-//
-//    @Mapping(source = "supplier.name", target = "supplierName")
-//    @Mapping(source = "createdBy.fullname", target = "createdByName") // Sử dụng relationship thực sự
-//    @Mapping(target = "grandTotal", ignore = true)
-//    PurchaseOrderDetailResponse toDetailResponse(PurchaseOrder purchaseOrder);
-//
-//    @Mapping(source = "supplier.name", target = "supplierName")
-//    @Mapping(target = "grandTotal", ignore = true)
-//    PurchaseOrderSummaryResponse toSummaryResponse(PurchaseOrder purchaseOrder);
-//
-//    List<PurchaseOrderSummaryResponse> toSummaryResponseList(List<PurchaseOrder> purchaseOrders);
-//
-////    @Mapping(source = "id", target = "itemId")
-////    @Mapping(source = "variant.id", target = "variantId") // Sử dụng relationship thực sự
-////    @Mapping(source = "variant.sku", target = "variantSku") // Sử dụng relationship thực sự
-////    @Mapping(source = "variant.name", target = "variantName") // Sử dụng relationship thực sự
-////    @Mapping(target = "totalPrice", ignore = true)
-////    PurchaseOrderDetailResponse.ItemResponse itemToItemResponse(PurchaseOrderItem item);
-//
-//    @AfterMapping
-//    default void calculateTotals(@MappingTarget PurchaseOrderDetailResponse dto, PurchaseOrder po) {
-//        if (dto.getItems() != null && po.getItems() != null) {
-//            for (int i = 0; i < dto.getItems().size(); i++) {
-//                PurchaseOrderDetailResponse.ItemResponse itemDto = dto.getItems().get(i);
-//                if(itemDto.getQuantity() != null && itemDto.getUnitPrice() != null) {
-//                    itemDto.setTotalPrice(itemDto.getUnitPrice().multiply(new BigDecimal(itemDto.getQuantity())));
-//                }
-//            }
-//        }
-//
-//        BigDecimal grandTotal = po.getItems().stream()
-//                .map(item -> item.getUnitPrice().multiply(new BigDecimal(item.getQuantity())))
-//                .reduce(BigDecimal.ZERO, BigDecimal::add);
-//        dto.setGrandTotal(grandTotal);
-//    }
-//
-//    @AfterMapping
-//    default void calculateGrandTotalForSummary(@MappingTarget PurchaseOrderSummaryResponse dto, PurchaseOrder po) {
-//        BigDecimal grandTotal = po.getItems().stream()
-//                .map(item -> item.getUnitPrice().multiply(new BigDecimal(item.getQuantity())))
-//                .reduce(BigDecimal.ZERO, BigDecimal::add);
-//        dto.setGrandTotal(grandTotal);
-//    }
-//}
+package com.example.demo.supplychain.mapper;
+
+import com.example.demo.supplychain.dto.response.PurchaseOrderDetailResponse;
+import com.example.demo.supplychain.dto.response.PurchaseOrderSummaryResponse;
+import com.example.demo.supplychain.entity.PurchaseOrder;
+import com.example.demo.user.entity.Employee;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Component // Thay thế @Mapper(componentModel = "spring")
+public class PurchaseOrderMapper { // Chuyển từ "interface" thành "class"
+
+    // Bỏ @Mapping và viết code xử lý trực tiếp
+    public PurchaseOrderDetailResponse toDetailResponse(PurchaseOrder purchaseOrder) {
+        if (purchaseOrder == null) {
+            return null;
+        }
+
+        PurchaseOrderDetailResponse response = new PurchaseOrderDetailResponse();
+
+        response.setId(purchaseOrder.getId());
+        response.setOrderDate(purchaseOrder.getOrderDate());
+        response.setExpectedDeliveryDate(purchaseOrder.getExpectedDeliveryDate());
+        response.setStatus(purchaseOrder.getStatus());
+
+        if (purchaseOrder.getSupplier() != null) {
+            response.setSupplierName(purchaseOrder.getSupplier().getName());
+        }
+
+        Employee createdBy = purchaseOrder.getCreatedBy();
+        if (createdBy != null) {
+            response.setCreatedByName(createdBy.getFullname());
+        }
+
+        return response;
+    }
+
+    // Bỏ @Mapping và viết code xử lý trực tiếp
+    public PurchaseOrderSummaryResponse toSummaryResponse(PurchaseOrder purchaseOrder) {
+        if (purchaseOrder == null) {
+            return null;
+        }
+
+        PurchaseOrderSummaryResponse summary = new PurchaseOrderSummaryResponse();
+
+        summary.setId(purchaseOrder.getId());
+        summary.setOrderDate(purchaseOrder.getOrderDate());
+        summary.setStatus(purchaseOrder.getStatus());
+
+        if (purchaseOrder.getSupplier() != null) {
+            summary.setSupplierName(purchaseOrder.getSupplier().getName());
+        }
+
+        return summary;
+    }
+
+    // Viết code xử lý trực tiếp
+    public List<PurchaseOrderSummaryResponse> toSummaryResponseList(List<PurchaseOrder> purchaseOrders) {
+        if (purchaseOrders == null || purchaseOrders.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        return purchaseOrders.stream()
+                .map(this::toSummaryResponse)
+                .collect(Collectors.toList());
+    }
+}

@@ -1,5 +1,6 @@
 package com.example.demo.supplychain.controller;
 
+import com.example.demo.supplychain.dto.response.SupplierResponse;
 import com.example.demo.supplychain.entity.Supplier;
 import com.example.demo.supplychain.service.SupplierService;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +18,8 @@ public class SupplierController {
     private final SupplierService supplierService;
 
     @GetMapping
-    public ResponseEntity<List<Supplier>> getAllSuppliers() {
-        List<Supplier> suppliers = supplierService.getAllSuppliers();
+    public ResponseEntity<List<SupplierResponse>> getAllSuppliers() { // <-- Thay đổi
+        List<SupplierResponse> suppliers = supplierService.getAllSuppliers(); // Service đã trả về DTO
         return ResponseEntity.ok(suppliers);
     }
 

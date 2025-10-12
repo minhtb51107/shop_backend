@@ -5,6 +5,7 @@ import com.example.demo.supplychain.entity.GoodsReceipt;
 import com.example.demo.supplychain.service.GoodsReceiptService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,31 +47,11 @@ public class GoodsReceiptController {
         }
     }
 
-//    @PostMapping("/{id}/items")
-//    public ResponseEntity<GoodsReceiptItem> addItemToGoodsReceipt(
-//            @PathVariable Integer id, 
-//            @RequestBody AddItemRequest request) {
-//        try {
-//            GoodsReceiptItem item = goodsReceiptService.addItemToGoodsReceipt(
-//                id, 
-//                request.getPoItemId(), 
-//                request.getQuantityReceived(), 
-//                request.getEmployeeId()
-//            );
-//            return ResponseEntity.ok(item);
-//        } catch (Exception e) {
-//            return ResponseEntity.badRequest().build();
-//        }
-//    }
-
     @PostMapping("/{id}/complete")
+    @PreAuthorize("hasAnyRole('ADMIN', 'WAREHOUSE_MANAGER')") // Phân quyền cho người có thẩm quyền
     public ResponseEntity<Void> completeGoodsReceipt(@PathVariable Integer id) {
-        try {
-            goodsReceiptService.completeGoodsReceipt(id);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+        goodsReceiptService.completeGoodsReceipt(id);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")

@@ -1,6 +1,8 @@
 package com.example.demo.supplychain.service.impl;
 
+import com.example.demo.supplychain.dto.response.SupplierResponse;
 import com.example.demo.supplychain.entity.Supplier;
+import com.example.demo.supplychain.mapper.SupplierMapper;
 import com.example.demo.supplychain.repository.SupplierRepository;
 import com.example.demo.supplychain.service.SupplierService;
 import jakarta.persistence.EntityNotFoundException;
@@ -10,17 +12,21 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class SupplierServiceImpl implements SupplierService {
 
     private final SupplierRepository supplierRepository;
+    private final SupplierMapper supplierMapper;
 
     @Override
     @Transactional(readOnly = true)
-    public List<Supplier> getAllSuppliers() {
-        return supplierRepository.findAll();
+    public List<SupplierResponse> getAllSuppliers() { // <-- Thay đổi kiểu trả về
+        return supplierRepository.findAll().stream()
+               .map(supplierMapper::toSupplierResponse)
+               .collect(Collectors.toList());
     }
 
     @Override
