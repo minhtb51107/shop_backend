@@ -17,7 +17,7 @@ import java.util.List;
 public interface PurchaseOrderMapper {
 
     @Mapping(source = "supplier.name", target = "supplierName")
-    @Mapping(source = "createdByEmployeeId", target = "createdByName") // Chỉ lưu ID thay vì reference
+    @Mapping(source = "createdBy.fullname", target = "createdByName") // Sử dụng relationship thực sự
     @Mapping(target = "grandTotal", ignore = true)
     PurchaseOrderDetailResponse toDetailResponse(PurchaseOrder purchaseOrder);
 
@@ -28,9 +28,9 @@ public interface PurchaseOrderMapper {
     List<PurchaseOrderSummaryResponse> toSummaryResponseList(List<PurchaseOrder> purchaseOrders);
 
     @Mapping(source = "id", target = "itemId")
-    @Mapping(source = "variantId", target = "variantId") // Chỉ lưu ID thay vì reference
-    @Mapping(target = "variantSku", ignore = true) // Không có reference đến ProductVariant
-    @Mapping(target = "variantName", ignore = true) // Không có reference đến ProductVariant
+    @Mapping(source = "variant.id", target = "variantId") // Sử dụng relationship thực sự
+    @Mapping(source = "variant.sku", target = "variantSku") // Sử dụng relationship thực sự
+    @Mapping(source = "variant.name", target = "variantName") // Sử dụng relationship thực sự
     @Mapping(target = "totalPrice", ignore = true)
     PurchaseOrderDetailResponse.ItemResponse itemToItemResponse(PurchaseOrderItem item);
 

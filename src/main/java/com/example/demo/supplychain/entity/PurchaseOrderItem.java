@@ -24,8 +24,10 @@ public class PurchaseOrderItem {
     @JsonIgnoreProperties({"items"}) // Tránh circular reference
     private PurchaseOrder purchaseOrder;
 
-    @Column(name = "variant_id", nullable = false)
-    private Integer variantId; // Chỉ lưu ID thay vì reference
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "variant_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private ProductVariant variant; // Tham chiếu đến Entity ProductVariant
 
     @Column(nullable = false)
     private Integer quantity;

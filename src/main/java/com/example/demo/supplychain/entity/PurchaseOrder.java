@@ -36,8 +36,10 @@ public class PurchaseOrder {
     @Column(name = "status", nullable = false, length = 50)
     private PurchaseOrderStatus status;
 
-    @Column(name = "created_by_employee_id", nullable = false)
-    private Integer createdByEmployeeId; // Chỉ lưu ID thay vì reference
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by_employee_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Employee createdBy; // Tham chiếu đến Entity Employee
 
     @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties({"purchaseOrder"}) // Tránh circular reference

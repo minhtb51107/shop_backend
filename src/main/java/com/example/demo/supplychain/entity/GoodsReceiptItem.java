@@ -27,8 +27,10 @@ public class GoodsReceiptItem {
     @JoinColumn(name = "po_item_id")
     private PurchaseOrderItem purchaseOrderItem;
 
-    @Column(name = "variant_id", nullable = false)
-    private Integer variantId; // Chỉ lưu ID thay vì reference
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "variant_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private ProductVariant variant; // Tham chiếu đến Entity ProductVariant
 
     @Column(name = "quantity_received", nullable = false)
     private Integer quantityReceived;

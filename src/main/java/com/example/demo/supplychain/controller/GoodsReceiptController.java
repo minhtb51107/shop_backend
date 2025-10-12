@@ -1,56 +1,114 @@
 package com.example.demo.supplychain.controller;
 
 import com.example.demo.supplychain.entity.GoodsReceipt;
-import com.example.demo.supplychain.repository.GoodsReceiptRepository;
+import com.example.demo.supplychain.entity.GoodsReceiptItem;
+import com.example.demo.supplychain.service.GoodsReceiptService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/goods-receipts")
 @RequiredArgsConstructor
 public class GoodsReceiptController {
 
-    private final GoodsReceiptRepository goodsReceiptRepository;
+    private final GoodsReceiptService goodsReceiptService;
 
     @GetMapping
     public ResponseEntity<List<GoodsReceipt>> getAllGoodsReceipts() {
-        List<GoodsReceipt> goodsReceipts = goodsReceiptRepository.findAll();
+        List<GoodsReceipt> goodsReceipts = goodsReceiptService.getAllGoodsReceipts();
         return ResponseEntity.ok(goodsReceipts);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<GoodsReceipt> getGoodsReceiptById(@PathVariable Integer id) {
-        Optional<GoodsReceipt> goodsReceipt = goodsReceiptRepository.findById(id);
-        return goodsReceipt.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        try {
+            GoodsReceipt goodsReceipt = goodsReceiptService.getGoodsReceiptById(id);
+            return ResponseEntity.ok(goodsReceipt);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping
-    public ResponseEntity<GoodsReceipt> createGoodsReceipt(@RequestBody GoodsReceipt goodsReceipt) {
-        GoodsReceipt savedGoodsReceipt = goodsReceiptRepository.save(goodsReceipt);
-        return ResponseEntity.ok(savedGoodsReceipt);
+    public ResponseEntity<GoodsReceipt> createGoodsReceipt(@RequestBody CreateGoodsReceiptRequest request) {
+        try {
+            GoodsReceipt goodsReceipt = goodsReceiptService.createGoodsReceipt(
+                request.getPurchaseOrderId(), 
+                request.getWarehouseId(), 
+                request.getEmployeeId()
+            );
+            return ResponseEntity.ok(goodsReceipt);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<GoodsReceipt> updateGoodsReceipt(@PathVariable Integer id, @RequestBody GoodsReceipt goodsReceipt) {
-        if (!goodsReceiptRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
+    @PostMapping("/{id}/items")
+    public ResponseEntity<GoodsReceiptItem> addItemToGoodsReceipt(
+            @PathVariable Integer id, 
+            @RequestBody AddItemRequest request) {
+        try {
+            GoodsReceiptItem item = goodsReceiptService.addItemToGoodsReceipt(
+                id, 
+                request.getPoItemId(), 
+                request.getQuantityReceived(), 
+                request.getEmployeeId()
+            );
+            return ResponseEntity.ok(item);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
         }
-        goodsReceipt.setId(id);
-        GoodsReceipt updatedGoodsReceipt = goodsReceiptRepository.save(goodsReceipt);
-        return ResponseEntity.ok(updatedGoodsReceipt);
+    }
+
+    @PostMapping("/{id}/complete")
+    public ResponseEntity<Void> completeGoodsReceipt(@PathVariable Integer id) {
+        try {
+            goodsReceiptService.completeGoodsReceipt(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGoodsReceipt(@PathVariable Integer id) {
-        if (!goodsReceiptRepository.existsById(id)) {
+        try {
+            goodsReceiptService.deleteGoodsReceipt(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
-        goodsReceiptRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
+    }
+
+    // DTOs for request bodies
+    public static class CreateGoodsReceiptRequest {
+        private Integer purchaseOrderId;
+        private Integer warehouseId;
+        private Integer employeeId;
+
+        // Getters and setters
+        public Integer getPurchaseOrderId() { return purchaseOrderId; }
+        public void setPurchaseOrderId(Integer purchaseOrderId) { this.purchaseOrderId = purchaseOrderId; }
+        public Integer getWarehouseId() { return warehouseId; }
+        public void setWarehouseId(Integer warehouseId) { this.warehouseId = warehouseId; }
+        public Integer getEmployeeId() { return employeeId; }
+        public void setEmployeeId(Integer employeeId) { this.employeeId = employeeId; }
+    }
+
+    public static class AddItemRequest {
+        private Integer poItemId;
+        private Integer quantityReceived;
+        private Integer employeeId;
+
+        // Getters and setters
+        public Integer getPoItemId() { return poItemId; }
+        public void setPoItemId(Integer poItemId) { this.poItemId = poItemId; }
+        public Integer getQuantityReceived() { return quantityReceived; }
+        public void setQuantityReceived(Integer quantityReceived) { this.quantityReceived = quantityReceived; }
+        public Integer getEmployeeId() { return employeeId; }
+        public void setEmployeeId(Integer employeeId) { this.employeeId = employeeId; }
     }
 }

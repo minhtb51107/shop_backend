@@ -31,8 +31,10 @@ public class GoodsReceipt {
     @Column(name = "receipt_date", nullable = false)
     private LocalDate receiptDate;
 
-    @Column(name = "created_by_employee_id", nullable = false)
-    private Integer createdByEmployeeId; // Chỉ lưu ID thay vì reference
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by_employee_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Employee createdBy; // Tham chiếu đến Entity Employee
 
     @OneToMany(mappedBy = "goodsReceipt", cascade = CascadeType.ALL)
     private List<GoodsReceiptItem> items;
