@@ -1,6 +1,7 @@
 package com.example.demo.finance.service.impl;
 
 import com.example.demo.finance.dto.request.AccountRequest;
+import com.example.demo.finance.dto.request.UpdateAccountRequest;
 import com.example.demo.finance.dto.response.AccountResponse;
 import com.example.demo.finance.entity.ChartOfAccounts;
 import com.example.demo.finance.mapper.ChartOfAccountsMapper; // THÊM IMPORT
@@ -43,4 +44,32 @@ public class ChartOfAccountsServiceImpl implements ChartOfAccountsService {
         return mapper.toResponseList(accounts);
     }
 
+    @Override
+    public void deleteAccount(Integer accountId) {
+        ChartOfAccounts account = repository.findById(accountId)
+                .orElseThrow(() -> new RuntimeException("Account not found with id: " + accountId));
+
+        // Xóa mềm: chỉ đổi trạng thái, không xóa khỏi DB
+        account.setIsActive(false);
+
+        repository.save(account);
+    }
+
+    @Override
+    public AccountResponse updateAccount(Integer accountId, UpdateAccountRequest request) {
+        // 1. Tìm tài khoản hiện có trong DB
+        ChartOfAccounts existingAccount = repository.findById(accountId)
+                .orElseThrow(() -> new RuntimeException("Account not found with id: " + accountId));
+
+        // 2. Cập nhật các trường thông tin từ request DTO
+        existingAccount.setAccountName(request.getAccountName());
+        existingAccount.setAccountType(request.getAccountType());
+        existingAccount.setDescription(request.getDescription());
+
+        // 3. Lưu lại vào DB
+        ChartOfAccounts updatedAccount = repository.save(existingAccount);
+
+        // 4. Dùng mapper để trả về kết quả
+        return mapper.toResponse(updatedAccount);
+    }
 }

@@ -6,6 +6,8 @@ import com.example.demo.finance.entity.ChartOfAccounts;
 import com.example.demo.finance.entity.FinancialPeriod;
 import com.example.demo.finance.entity.JournalEntry;
 import com.example.demo.finance.entity.JournalEntryItem;
+import com.example.demo.finance.exception.AccountInactiveException;
+import com.example.demo.finance.exception.PeriodClosedException;
 import com.example.demo.finance.mapper.AccountingMapper;
 import com.example.demo.finance.repository.ChartOfAccountsRepository;
 import com.example.demo.finance.repository.FinancialPeriodRepository;
@@ -26,12 +28,12 @@ public class AccountingServiceImpl implements AccountingService {
     private final JournalEntryRepository journalEntryRepository;
     private final FinancialPeriodRepository financialPeriodRepository;
     private final ChartOfAccountsRepository chartOfAccountsRepository;
-    private final AccountingMapper mapper; // Inject mapper vào
+    private final AccountingMapper mapper;
 
     @Override
     @Transactional
     public JournalEntryResponse createJournalEntry(JournalEntryRequest request) {
-        //  Validation: Tổng Nợ phải bằng Tổng Có
+        // Validation: Tổng Nợ phải bằng Tổng Có
         BigDecimal totalDebit = request.getItems().stream()
                 .map(item -> item.getDebit() != null ? item.getDebit() : BigDecimal.ZERO)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -44,11 +46,16 @@ public class AccountingServiceImpl implements AccountingService {
             throw new IllegalArgumentException("Total debit must equal total credit.");
         }
 
-        //  Lấy các đối tượng liên quan từ DB
+        // Lấy các đối tượng liên quan từ DB
         FinancialPeriod period = financialPeriodRepository.findById(request.getPeriodId())
                 .orElseThrow(() -> new RuntimeException("Financial period not found with id: " + request.getPeriodId()));
 
-        //  Tạo đối tượng JournalEntry chính
+        // Dùng đúng custom exception
+        if (!"OPEN".equals(period.getStatus())) {
+            throw new PeriodClosedException("Cannot create journal entry because the period '" + period.getName() + "' is closed.");
+        }
+
+        // Tạo đối tượng JournalEntry chính
         JournalEntry entry = JournalEntry.builder()
                 .period(period)
                 .description(request.getDescription())
@@ -58,13 +65,18 @@ public class AccountingServiceImpl implements AccountingService {
                 .items(new ArrayList<>())
                 .build();
 
-        //  Tạo các đối tượng JournalEntryItem con
+        // Tạo các đối tượng JournalEntryItem con
         for (JournalEntryRequest.JournalEntryItemRequest itemRequest : request.getItems()) {
             ChartOfAccounts account = chartOfAccountsRepository.findById(itemRequest.getAccountId())
                     .orElseThrow(() -> new RuntimeException("Account not found with id: " + itemRequest.getAccountId()));
 
+            // Chỉ throw đúng exception cho trường hợp này
+            if (account.getIsActive() == null || !account.getIsActive()) {
+                throw new AccountInactiveException("Cannot use inactive account: " + account.getAccountCode() + " - " + account.getAccountName());
+            }
+
             JournalEntryItem item = JournalEntryItem.builder()
-                    .entry(entry) // Liên kết với bút toán cha
+                    .entry(entry)
                     .account(account)
                     .debit(itemRequest.getDebit() != null ? itemRequest.getDebit() : BigDecimal.ZERO)
                     .credit(itemRequest.getCredit() != null ? itemRequest.getCredit() : BigDecimal.ZERO)
@@ -75,7 +87,7 @@ public class AccountingServiceImpl implements AccountingService {
         // Lưu vào DB
         JournalEntry savedEntry = journalEntryRepository.save(entry);
 
-        //  Dùng mapper để chuyển đổi sang DTO trả về
+        // Dùng mapper để chuyển đổi sang DTO trả về
         return mapper.toJournalEntryResponse(savedEntry);
     }
 }
