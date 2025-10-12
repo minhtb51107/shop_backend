@@ -31,28 +31,13 @@ ext {
 }
 
 dependencies {
-<<<<<<< HEAD
 	// --- Spring Boot ---
-=======
-	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
-	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
-
-	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
-
-	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
->>>>>>> origin/Module-2
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-<<<<<<< HEAD
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
 	// --- Lombok ---
-=======
-	implementation 'org.springframework.boot:spring-boot-starter-websocket'
-	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
->>>>>>> origin/Module-2
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 

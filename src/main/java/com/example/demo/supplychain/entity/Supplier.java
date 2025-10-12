@@ -10,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "supplychain_suppliers") // Thêm prefix để tránh conflict
+@Table(name = "suppliers") // Thêm prefix để tránh conflict
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Supplier {
     @Id

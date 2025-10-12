@@ -1,5 +1,6 @@
 package com.example.demo.supplychain.entity;
 
+import com.example.demo.user.entity.Employee;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
@@ -13,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "supplychain_goods_receipts") // Thêm prefix để tránh conflict
+@Table(name = "goods_receipts") // Thêm prefix để tránh conflict
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class GoodsReceipt {
     @Id
@@ -36,6 +37,6 @@ public class GoodsReceipt {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Employee createdBy; // Tham chiếu đến Entity Employee
 
-    @OneToMany(mappedBy = "goodsReceipt", cascade = CascadeType.ALL)
-    private List<GoodsReceiptItem> items;
+//    @OneToMany(mappedBy = "goodsReceipt", cascade = CascadeType.ALL)
+//    private List<GoodsReceiptItem> items;
 }

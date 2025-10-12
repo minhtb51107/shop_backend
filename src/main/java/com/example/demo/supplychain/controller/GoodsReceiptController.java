@@ -1,7 +1,7 @@
 package com.example.demo.supplychain.controller;
 
 import com.example.demo.supplychain.entity.GoodsReceipt;
-import com.example.demo.supplychain.entity.GoodsReceiptItem;
+//import com.example.demo.supplychain.entity.GoodsReceiptItem;
 import com.example.demo.supplychain.service.GoodsReceiptService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -46,22 +46,22 @@ public class GoodsReceiptController {
         }
     }
 
-    @PostMapping("/{id}/items")
-    public ResponseEntity<GoodsReceiptItem> addItemToGoodsReceipt(
-            @PathVariable Integer id, 
-            @RequestBody AddItemRequest request) {
-        try {
-            GoodsReceiptItem item = goodsReceiptService.addItemToGoodsReceipt(
-                id, 
-                request.getPoItemId(), 
-                request.getQuantityReceived(), 
-                request.getEmployeeId()
-            );
-            return ResponseEntity.ok(item);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
+//    @PostMapping("/{id}/items")
+//    public ResponseEntity<GoodsReceiptItem> addItemToGoodsReceipt(
+//            @PathVariable Integer id, 
+//            @RequestBody AddItemRequest request) {
+//        try {
+//            GoodsReceiptItem item = goodsReceiptService.addItemToGoodsReceipt(
+//                id, 
+//                request.getPoItemId(), 
+//                request.getQuantityReceived(), 
+//                request.getEmployeeId()
+//            );
+//            return ResponseEntity.ok(item);
+//        } catch (Exception e) {
+//            return ResponseEntity.badRequest().build();
+//        }
+//    }
 
     @PostMapping("/{id}/complete")
     public ResponseEntity<Void> completeGoodsReceipt(@PathVariable Integer id) {

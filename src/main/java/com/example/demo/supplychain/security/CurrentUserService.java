@@ -1,9 +1,10 @@
 package com.example.demo.supplychain.security;
 
-import com.example.demo.supplychain.entity.Employee;
-import com.example.demo.supplychain.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import com.example.demo.user.entity.Employee;
+import com.example.demo.user.repository.EmployeeRepository;
 
 /**
  * Service để lấy thông tin user hiện tại

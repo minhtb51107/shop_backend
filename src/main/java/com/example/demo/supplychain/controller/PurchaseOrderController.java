@@ -19,22 +19,22 @@ public class PurchaseOrderController {
 
     private final PurchaseOrderService purchaseOrderService;
 
-    @PostMapping
-    public ResponseEntity<PurchaseOrderDetailResponse> createPurchaseOrder(@RequestBody CreatePurchaseOrderRequest request) {
-        PurchaseOrderDetailResponse createdOrder = purchaseOrderService.createPurchaseOrder(request);
-        // Trả về DTO chi tiết của đơn hàng vừa tạo với status 201 CREATED
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
-    }
+//    @PostMapping
+//    public ResponseEntity<PurchaseOrderDetailResponse> createPurchaseOrder(@RequestBody CreatePurchaseOrderRequest request) {
+//        PurchaseOrderDetailResponse createdOrder = purchaseOrderService.createPurchaseOrder(request);
+//        // Trả về DTO chi tiết của đơn hàng vừa tạo với status 201 CREATED
+//        return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
+//    }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<PurchaseOrderDetailResponse> getPurchaseOrderById(@PathVariable Integer id) {
-        PurchaseOrderDetailResponse orderDetail = purchaseOrderService.findPurchaseOrderById(id);
-        return ResponseEntity.ok(orderDetail);
-    }
-
-    @GetMapping
-    public ResponseEntity<List<PurchaseOrderSummaryResponse>> getAllPurchaseOrders() {
-        List<PurchaseOrderSummaryResponse> orders = purchaseOrderService.findAllPurchaseOrders();
-        return ResponseEntity.ok(orders);
-    }
+//    @GetMapping("/{id}")
+//    public ResponseEntity<PurchaseOrderDetailResponse> getPurchaseOrderById(@PathVariable Integer id) {
+//        PurchaseOrderDetailResponse orderDetail = purchaseOrderService.findPurchaseOrderById(id);
+//        return ResponseEntity.ok(orderDetail);
+//    }
+//
+//    @GetMapping
+//    public ResponseEntity<List<PurchaseOrderSummaryResponse>> getAllPurchaseOrders() {
+//        List<PurchaseOrderSummaryResponse> orders = purchaseOrderService.findAllPurchaseOrders();
+//        return ResponseEntity.ok(orders);
+//    }
 }

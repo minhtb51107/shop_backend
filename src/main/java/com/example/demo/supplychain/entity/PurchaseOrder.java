@@ -1,6 +1,7 @@
 package com.example.demo.supplychain.entity;
 
 import com.example.demo.supplychain.enums.PurchaseOrderStatus;
+import com.example.demo.user.entity.Employee;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "supplychain_purchase_orders") // Thêm prefix để tránh conflict
+@Table(name = "purchase_orders") // Thêm prefix để tránh conflict
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class PurchaseOrder {
     @Id
@@ -41,7 +42,7 @@ public class PurchaseOrder {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Employee createdBy; // Tham chiếu đến Entity Employee
 
-    @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties({"purchaseOrder"}) // Tránh circular reference
-    private List<PurchaseOrderItem> items;
+//    @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL, orphanRemoval = true)
+//    @JsonIgnoreProperties({"purchaseOrder"}) // Tránh circular reference
+//    private List<PurchaseOrderItem> items;
 }
