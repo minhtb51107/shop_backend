@@ -67,10 +67,9 @@ public class OrderServiceImpl implements OrderService {
         Employee handledBy = employeeRepository.findById(1)
                .orElseThrow(() -> new EntityNotFoundException("Employee not found"));
 
-        Order order = new Order();
+        Order order = orderMapper.toEntity(request);
         order.setCustomer(customer);
         order.setWarehouse(warehouse);
-        order.setShippingAddress(request.getShippingAddress());
         order.setCreatedAt(OffsetDateTime.now());
         order.setStatus("PENDING");
         order.setHandledBy(handledBy);
