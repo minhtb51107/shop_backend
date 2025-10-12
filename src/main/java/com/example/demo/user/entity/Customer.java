@@ -12,7 +12,7 @@ import lombok.*;
 @Table(name = "customers")
 public class Customer {
 
-    @Id
+    @Id	
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 

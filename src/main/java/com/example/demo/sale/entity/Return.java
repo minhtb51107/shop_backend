@@ -31,6 +31,6 @@ public class Return {
     @JoinColumn(name = "created_by_employee_id")
     private Employee createdBy;
 
-    @OneToMany(mappedBy = "return", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "returned", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReturnItem> items;
 }
