@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/brands")
+@RequestMapping("/api/v1/brands")
 public class BrandController {
 
     private final BrandRepository brandRepository;

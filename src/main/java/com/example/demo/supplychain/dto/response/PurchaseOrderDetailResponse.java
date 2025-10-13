@@ -1,8 +1,11 @@
+// src/main/java/com/example/demo/supplychain/dto/response/PurchaseOrderDetailResponse.java
 package com.example.demo.supplychain.dto.response;
 
+import com.example.demo.product.dto.response.PurchaseOrderItemResponse; // THÊM IMPORT NÀY
 import com.example.demo.supplychain.enums.PurchaseOrderStatus;
 import lombok.Data;
 import java.time.LocalDate;
+import java.util.List; // THÊM IMPORT NÀY
 
 @Data
 public class PurchaseOrderDetailResponse {
@@ -12,5 +15,7 @@ public class PurchaseOrderDetailResponse {
     private LocalDate expectedDeliveryDate;
     private PurchaseOrderStatus status;
     private String createdByName;
-    // Đã xóa List<ItemResponse> items và grandTotal
+    
+    // *** THÊM DÒNG NÀY ***
+    private List<PurchaseOrderItemResponse> items;
 }

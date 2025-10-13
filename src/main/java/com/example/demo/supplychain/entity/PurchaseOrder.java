@@ -1,7 +1,9 @@
+// src/main/java/com/example/demo/supplychain/entity/PurchaseOrder.java
 package com.example.demo.supplychain.entity;
 
 import com.example.demo.supplychain.enums.PurchaseOrderStatus;
 import com.example.demo.user.entity.Employee;
+import com.example.demo.product.entity.PurchaseOrderItem; // THÊM IMPORT NÀY
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
@@ -15,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "purchase_orders") // Thêm prefix để tránh conflict
+@Table(name = "purchase_orders")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class PurchaseOrder {
     @Id
@@ -40,9 +42,10 @@ public class PurchaseOrder {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by_employee_id", nullable = false)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private Employee createdBy; // Tham chiếu đến Entity Employee
+    private Employee createdBy;
 
-//    @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL, orphanRemoval = true)
-//    @JsonIgnoreProperties({"purchaseOrder"}) // Tránh circular reference
-//    private List<PurchaseOrderItem> items;
+    // *** BỎ COMMENT VÀ CẬP NHẬT MAPPING ***
+    @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties({"purchaseOrder"}) // Tránh circular reference
+    private List<PurchaseOrderItem> items;
 }

@@ -1,3 +1,4 @@
+// src/main/java/com/example/demo/config/WebConfig.java
 package com.example.demo.config;
 
 import org.springframework.context.annotation.Bean;
@@ -13,13 +14,13 @@ public class WebConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/api/**") // Áp dụng cho tất cả các API bắt đầu bằng /api/
-                        .allowedOrigins("http://localhost:3000", "https://your-frontend-domain.com") // Domain của frontend
-                        .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS") // Các phương thức cho phép
-                        .allowedHeaders("*") // Cho phép tất cả các header
-                        .allowCredentials(true); // Cho phép gửi cookie và thông tin xác thực
+                // Áp dụng cho TẤT CẢ các đường dẫn dưới /api/v1/
+                registry.addMapping("/api/v1/**")
+                        .allowedOrigins("http://localhost:5173") // Cho phép domain của frontend
+                        .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+                        .allowedHeaders("*")
+                        .allowCredentials(true);
             }
         };
     }
 }
-

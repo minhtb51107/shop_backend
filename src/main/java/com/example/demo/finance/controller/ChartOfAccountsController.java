@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/finance/accounts")
+@RequestMapping("/api/v1/finance/accounts")
 @RequiredArgsConstructor
 public class ChartOfAccountsController {
 

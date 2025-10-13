@@ -1,19 +1,26 @@
+// src/main/java/com/example/demo/supplychain/mapper/PurchaseOrderMapper.java
 package com.example.demo.supplychain.mapper;
 
+import com.example.demo.product.mapper.PurchaseOrderItemMapper; // THÊM IMPORT NÀY
 import com.example.demo.supplychain.dto.response.PurchaseOrderDetailResponse;
 import com.example.demo.supplychain.dto.response.PurchaseOrderSummaryResponse;
 import com.example.demo.supplychain.entity.PurchaseOrder;
 import com.example.demo.user.entity.Employee;
+import lombok.RequiredArgsConstructor; // THÊM IMPORT NÀY
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Collections; // THÊM IMPORT NÀY
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component // Thay thế @Mapper(componentModel = "spring")
-public class PurchaseOrderMapper { // Chuyển từ "interface" thành "class"
+@Component
+@RequiredArgsConstructor // THÊM ANNOTATION NÀY
+public class PurchaseOrderMapper {
 
-    // Bỏ @Mapping và viết code xử lý trực tiếp
+    // *** INJECT ITEM MAPPER ***
+    private final PurchaseOrderItemMapper itemMapper;
+
     public PurchaseOrderDetailResponse toDetailResponse(PurchaseOrder purchaseOrder) {
         if (purchaseOrder == null) {
             return null;
@@ -34,11 +41,22 @@ public class PurchaseOrderMapper { // Chuyển từ "interface" thành "class"
         if (createdBy != null) {
             response.setCreatedByName(createdBy.getFullname());
         }
+        
+        // *** THÊM LOGIC MAPPING ITEMS ***
+        if (purchaseOrder.getItems() != null) {
+            response.setItems(
+                purchaseOrder.getItems().stream()
+                    .map(itemMapper::toResponse)
+                    .collect(Collectors.toList())
+            );
+        } else {
+            response.setItems(Collections.emptyList());
+        }
 
         return response;
     }
-
-    // Bỏ @Mapping và viết code xử lý trực tiếp
+    
+    // Phương thức toSummaryResponse và toSummaryResponseList giữ nguyên
     public PurchaseOrderSummaryResponse toSummaryResponse(PurchaseOrder purchaseOrder) {
         if (purchaseOrder == null) {
             return null;
@@ -56,8 +74,7 @@ public class PurchaseOrderMapper { // Chuyển từ "interface" thành "class"
 
         return summary;
     }
-
-    // Viết code xử lý trực tiếp
+    
     public List<PurchaseOrderSummaryResponse> toSummaryResponseList(List<PurchaseOrder> purchaseOrders) {
         if (purchaseOrders == null || purchaseOrders.isEmpty()) {
             return new ArrayList<>();
