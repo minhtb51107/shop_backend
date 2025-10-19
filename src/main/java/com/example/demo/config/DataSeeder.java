@@ -44,13 +44,16 @@ public class DataSeeder implements CommandLineRunner {
             Permission roleWrite = permissionRepository.save(new Permission(null, "ROLE_WRITE", "Write role data"));
             Permission productRead = permissionRepository.save(new Permission(null, "PRODUCT_READ", "Read product data"));
             Permission productWrite = permissionRepository.save(new Permission(null, "PRODUCT_WRITE", "Write product data"));
+            // Thêm quyền cho module tài chính
+            Permission viewFinance = permissionRepository.save(new Permission(null, "VIEW_FINANCE", "Xem dữ liệu tài chính"));
+            Permission manageFinance = permissionRepository.save(new Permission(null, "MANAGE_FINANCE", "Quản lý dữ liệu tài chính"));
 
 
             // Tạo vai trò ADMIN với tất cả các quyền
             Role adminRole = new Role();
             adminRole.setName("ADMIN");
             adminRole.setDescription("Quản trị viên hệ thống");
-            adminRole.setPermissions(new HashSet<>(Arrays.asList(userRead, userWrite, roleRead, roleWrite, productRead, productWrite)));
+            adminRole.setPermissions(new HashSet<>(Arrays.asList(userRead, userWrite, roleRead, roleWrite, productRead, productWrite, viewFinance, manageFinance)));
             roleRepository.save(adminRole);
 
 

@@ -32,15 +32,16 @@ public class UserActivityLogController {
      */
  // Bên trong lớp UserActivityLogController
 
+ // minhtb51107/shop_backend/shop_backend-integration/src/main/java/com/example/demo/user/controller/UserActivityLogController.java
+
     @GetMapping
     public ResponseEntity<Page<UserActivityLogResponse>> searchActivityLogs(
             @RequestParam(required = false) Integer userId,
             @RequestParam(required = false) String action,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime endDate,
-            Pageable pageable) {
+            Pageable pageable) { // Sửa ở đây
 
-        // SỬA LẠI DÒNG NÀY:
         Page<UserActivityLogResponse> logs = userActivityLogService.searchLogs(userId, action, startDate, endDate, pageable);
 
         return ResponseEntity.ok(logs);

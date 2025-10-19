@@ -18,9 +18,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration
-@EnableWebSecurity // Kích hoạt Spring Security
-@EnableMethodSecurity // Kích hoạt @PreAuthorize và các annotation khác
+@EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -30,23 +32,26 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // 1. Vô hiệu hóa CSRF vì chúng ta dùng API stateless
+                .cors(withDefaults())
                 .csrf(csrf -> csrf.disable())
-
-                // 2. Định nghĩa các quy tắc cho request
                 .authorizeHttpRequests(auth -> auth
-                        // Cho phép các endpoint này được truy cập công khai
-                        .requestMatchers("/api/v1/auth/**").permitAll()
-                        // (Tùy chọn) Cho phép truy cập Swagger UI nếu có
+                        // *** SỬA LẠI PHẦN NÀY ***
+                        // Chỉ cho phép các endpoint xác thực cụ thể, không dùng wildcard /**
+                        .requestMatchers(
+                                "/api/v1/auth/login",
+                                "/api/v1/auth/register",
+                                "/api/v1/auth/google",
+                                "/api/v1/auth/refresh-token",
+                                "/api/v1/auth/forgot-password",
+                                "/api/v1/auth/reset-password",
+                                "/api/v1/auth/activate"
+                        ).permitAll()
+                        // Cho phép truy cập Swagger UI
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        // Yêu cầu xác thực cho tất cả các request còn lại
+                        // Tất cả các request khác (bao gồm /api/v1/auth/me) phải được xác thực
                         .anyRequest().authenticated()
                 )
-
-                // 3. Cấu hình quản lý session là STATELESS
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
-                // 4. Thêm bộ lọc JWT vào trước bộ lọc mặc định của Spring
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -71,3 +76,4 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 }
+

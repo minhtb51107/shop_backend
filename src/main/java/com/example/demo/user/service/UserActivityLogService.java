@@ -1,6 +1,6 @@
 package com.example.demo.user.service;
 
-import java.awt.print.Pageable;
+import org.springframework.data.domain.Pageable; // Sửa import này
 import java.time.OffsetDateTime;
 
 import org.springframework.data.domain.Page;
@@ -23,8 +23,8 @@ public interface UserActivityLogService {
      * @param pageable Thông tin phân trang.
      * @return Một trang (Page) chứa danh sách log.
      */
-	Page<UserActivityLogResponse> getActivityLogs(org.springframework.data.domain.Pageable pageable);
+	Page<UserActivityLogResponse> getActivityLogs(Pageable pageable);
 
 	Page<UserActivityLogResponse> searchLogs(Integer userId, String action, OffsetDateTime startDate,
-			OffsetDateTime endDate, org.springframework.data.domain.Pageable pageable);
+			OffsetDateTime endDate, Pageable pageable);
 }

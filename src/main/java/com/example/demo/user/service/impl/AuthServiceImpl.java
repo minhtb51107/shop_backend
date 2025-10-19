@@ -294,6 +294,8 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+ // minhtb51107/shop_backend/shop_backend-integration/src/main/java/com/example/demo/user/service/impl/AuthServiceImpl.java
+
     private User registerNewUserFromGoogle(GoogleIdToken.Payload payload) {
         String email = payload.getEmail();
         String name = (String) payload.get("name");
@@ -302,17 +304,19 @@ public class AuthServiceImpl implements AuthService {
         // Tạo User mới
         User newUser = new User();
         newUser.setEmail(email);
-        newUser.setPassword(passwordEncoder.encode(UUID.randomUUID().toString())); // Mật khẩu ngẫu nhiên, không dùng
+        newUser.setPassword(passwordEncoder.encode(UUID.randomUUID().toString())); // Mật khẩu ngẫu nhiên
         newUser.setStatus(UserStatus.ACTIVE);
 
-        // Tạo Customer tương ứng
+        // Tạo Customer tương ứng và liên kết hai chiều
         Customer newCustomer = new Customer();
         newCustomer.setFullname(name);
         newCustomer.setPhoto(pictureUrl);
-        newCustomer.setUser(newUser); // Liên kết với user
-        // Số điện thoại có thể để trống (NULL)
+        newCustomer.setUser(newUser);
+        newUser.setCustomer(newCustomer); // <--- Thiết lập quan hệ hai chiều
 
-        customerRepository.save(newCustomer); // Lưu customer (user sẽ được lưu theo nhờ cascade)
+        // *** SỬA Ở ĐÂY ***
+        // Thay vì lưu customerRepository, hãy lưu userRepository
+        userRepository.save(newUser); // Lưu user (customer sẽ được lưu theo nhờ cascade)
         
         return newUser;
     }

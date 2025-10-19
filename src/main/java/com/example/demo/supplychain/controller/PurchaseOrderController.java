@@ -38,11 +38,13 @@ public class PurchaseOrderController {
         return ResponseEntity.ok(orderDetail);
     }
 
+ // minhtb51107/shop_backend/shop_backend-integration/src/main/java/com/example/demo/supplychain/controller/PurchaseOrderController.java
+
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'PURCHASING_MANAGER')")
     public ResponseEntity<Page<PurchaseOrderSummaryResponse>> getAllPurchaseOrders(
             @RequestParam(required = false) PurchaseOrderStatus status,
-            Pageable pageable) { // Spring sẽ tự động tạo đối tượng Pageable từ các param ?page=0&size=10&sort=orderDate,desc
+            Pageable pageable) { // Sửa ở đây
 
         Page<PurchaseOrderSummaryResponse> ordersPage = purchaseOrderService.findAllPurchaseOrders(pageable, status);
         return ResponseEntity.ok(ordersPage);

@@ -1,6 +1,9 @@
+// src/main/java/com/example/demo/config/security/JwtAuthenticationFilter.java
+
 package com.example.demo.config.security;
 
 import com.example.demo.shared.util.JwtUtil;
+import io.jsonwebtoken.ExpiredJwtException; // <-- *** THÊM DÒNG NÀY ***
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,32 +34,47 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
 
+        // Bỏ qua các đường dẫn xác thực để tránh kiểm tra token cũ/hết hạn
+        if (request.getRequestURI().startsWith("/api/v1/auth/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         final String authHeader = request.getHeader("Authorization");
 
-        // Bỏ qua nếu không có header Authorization hoặc không bắt đầu bằng "Bearer "
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
         final String jwt = authHeader.substring(7);
-        final String userEmail = jwtUtil.getEmailFromToken(jwt);
+        String userEmail = null;
 
-        // Nếu có email và chưa được xác thực trong SecurityContext
+        try {
+            userEmail = jwtUtil.getEmailFromToken(jwt);
+        } catch (ExpiredJwtException e) {
+            // Token hết hạn, không cần làm gì, chỉ ghi log và để yêu cầu đi tiếp
+            logger.warn("JWT Token has expired: " + e.getMessage());
+        } catch (Exception e) {
+            // Các lỗi khác khi phân tích token
+            logger.error("Error parsing JWT Token: " + e.getMessage());
+        }
+
         if (StringUtils.hasText(userEmail) && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
-            // Nếu token hợp lệ, tạo đối tượng xác thực và đặt vào SecurityContext
+            // Chỉ xác thực nếu token hợp lệ
             if (jwtUtil.validateToken(jwt)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
-                        null, // credentials
+                        null,
                         userDetails.getAuthorities()
                 );
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
+        
         filterChain.doFilter(request, response);
     }
 }
