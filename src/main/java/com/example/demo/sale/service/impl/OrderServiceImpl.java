@@ -9,6 +9,7 @@ import com.example.demo.sale.entity.OrderItem;
 import com.example.demo.sale.mapper.OrderMapper;
 import com.example.demo.sale.repository.OrderRepository;
 import com.example.demo.sale.service.OrderService;
+import com.example.demo.shared.exception.BadRequestException;
 import com.example.demo.user.entity.Customer;
 import com.example.demo.user.repository.CustomerRepository;
 import com.example.demo.user.entity.Employee;
@@ -19,6 +20,12 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.example.demo.user.entity.User; // Import User
+import com.example.demo.user.repository.UserRepository; // Import UserRepository
+import org.springframework.security.core.context.SecurityContextHolder; // Import SecurityContextHolder
+import org.springframework.security.core.userdetails.UsernameNotFoundException; // Import UsernameNotFoundException
+import org.springframework.data.domain.Page; // Import Page
+import org.springframework.data.domain.Pageable; // Import Pageable
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -33,8 +40,33 @@ public class OrderServiceImpl implements OrderService {
     private final VariantRepository variantRepository;
     private final WarehouseRepository warehouseRepository;
     private final EmployeeRepository employeeRepository;
+    private final UserRepository userRepository;
     private final OrderMapper orderMapper;
 
+    @Override
+    @Transactional(readOnly = true)
+    public Page<OrderResponse> getMyOrders(Pageable pageable) {
+        // 1. Lấy email của người dùng đang đăng nhập
+        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        // 2. Tìm User entity từ email
+        User currentUser = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy người dùng: " + userEmail));
+
+        // 3. Lấy Customer ID từ User (Giả định Customer luôn tồn tại nếu User là customer)
+        Integer customerId = currentUser.getCustomer() != null ? currentUser.getCustomer().getId() : null;
+        if (customerId == null) {
+             // Hoặc trả về trang rỗng nếu user không phải customer
+            throw new BadRequestException("Tài khoản hiện tại không phải là khách hàng.");
+        }
+
+        // 4. Gọi phương thức repository
+        Page<Order> orderPage = orderRepository.findByCustomerIdOrderByCreatedAtDesc(customerId, pageable);
+
+        // 5. Map sang DTO và trả về
+        return orderPage.map(orderMapper::toDto);
+    }
+    
     @Override
     @Transactional
     public OrderResponse createOrder(CreateOrderRequest request) {

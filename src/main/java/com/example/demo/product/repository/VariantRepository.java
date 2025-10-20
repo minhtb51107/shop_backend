@@ -1,22 +1,24 @@
+// src/main/java/com/example/demo/product/repository/VariantRepository.java
 package com.example.demo.product.repository;
 
 import com.example.demo.product.entity.ProductVariant;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query; // <<< THÊM IMPORT
+import org.springframework.data.repository.query.Param; // <<< THÊM IMPORT
 import org.springframework.stereotype.Repository;
 
-import java.util.List; // Hãy chắc chắn rằng bạn đã import thư viện này
+import java.util.List;
 
-@Repository
-public interface VariantRepository extends JpaRepository<ProductVariant, Long> {
+@Repository // Thêm @Repository nếu chưa có
+public interface VariantRepository extends JpaRepository<ProductVariant, Long> { // ID của Variant là Long
 
-    /**
-     * Tự động tạo câu lệnh query để tìm tất cả các ProductVariant
-     * dựa trên ID của Product (khóa ngoại product_id).
-     * Tên phương thức phải tuân thủ quy tắc của Spring Data:
-     * findBy + [Tên thuộc tính trong Entity]
-     * Trong ProductVariant.java, bạn có thuộc tính "private Product product;",
-     * nên Spring sẽ hiểu "ProductId" là tìm theo ID của thuộc tính "product".
-     */
-    List<ProductVariant> findByProductId(Integer productId);
+    // Sử dụng @Query và @Param thay vì dựa vào tên phương thức
+    // Giả sử trong ProductVariant entity có thuộc tính "Product product"
+	@Query("SELECT pv FROM ProductVariant pv WHERE pv.product.id = :prodId") // Đổi thành :prodId
+	List<ProductVariant> findByProductId(@Param("prodId") Integer productId); // Đổi thành @Param("prodId")
+
+    // HOẶC nếu trong ProductVariant entity có thuộc tính "Integer productId" trực tiếp
+    // @Query("SELECT pv FROM ProductVariant pv WHERE pv.productId = :pid")
+    // List<ProductVariant> findByProductId(@Param("pid") Integer productId);
 
 }

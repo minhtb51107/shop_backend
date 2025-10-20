@@ -3,11 +3,13 @@ package com.example.demo.user.dto.request;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@AllArgsConstructor
 public class RegisterRequest {
 
     @NotBlank(message = "Họ tên không được để trống")

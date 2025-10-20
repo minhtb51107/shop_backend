@@ -64,13 +64,7 @@ dependencies {
 	testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
     
-    // JUnit 5
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
-
-    // Mockito
-	testImplementation("org.mockito:mockito-core:5.18.0")
-    testImplementation 'org.mockito:mockito-junit-jupiter:5.11.0'
+ 
     
     implementation 'org.liquibase:liquibase-core'
     
@@ -91,13 +85,15 @@ tasks.named('test') {
 }
 
 // Cấu hình trình biên dịch Java để tích hợp MapStruct và Lombok
+// Trong file build.gradle
 tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8' // Nên thêm dòng này để đảm bảo encoding UTF-8
     options.getCompilerArgs().addAll([
+            '-parameters', // <-- THÊM DÒNG NÀY
             '-Amapstruct.defaultComponentModel=spring',
-			'-Amapstruct.unmappedTargetPolicy=IGNORE'
+            '-Amapstruct.unmappedTargetPolicy=IGNORE'
     ])
 }
-
 // Cấu hình để Gradle tự động tạo file .classpath cho Eclipse/STS
 eclipse {
     classpath {

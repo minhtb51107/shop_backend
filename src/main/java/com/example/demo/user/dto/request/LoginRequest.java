@@ -5,8 +5,13 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
 @Getter
 @Setter
+@AllArgsConstructor
 public class LoginRequest {
 
     @NotBlank(message = "Email không được để trống")

@@ -8,12 +8,22 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import org.springframework.data.domain.Page; // Import Page
+import org.springframework.data.domain.Pageable; // Import Pageable
+import org.springframework.security.access.prepost.PreAuthorize; // Import PreAuthorize
 
 @RestController
 @RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor
 public class OrderController {
     private final OrderService orderService;
+    
+    @GetMapping("/my-orders")
+    @PreAuthorize("isAuthenticated()") // Chỉ cần đăng nhập là được
+    public ResponseEntity<Page<OrderResponse>> getMyOrders(Pageable pageable) {
+        Page<OrderResponse> myOrders = orderService.getMyOrders(pageable);
+        return ResponseEntity.ok(myOrders);
+    }
 
     @PostMapping
     public ResponseEntity<OrderResponse> createOrder(@RequestBody CreateOrderRequest request) {
