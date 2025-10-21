@@ -44,7 +44,6 @@ dependencies {
 	// --- MapStruct ---
 	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
 	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
-	// Binding để Lombok và MapStruct hoạt động cùng nhau
 	annotationProcessor "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
 
 
@@ -64,7 +63,16 @@ dependencies {
 	testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
     
- 
+    // Thư viện TestNG
+    testImplementation 'org.testng:testng:7.10.2'
+
+    // === THAY ĐỔI Ở ĐÂY ===
+    // Thư viện Selenium (Nâng cấp phiên bản)
+    implementation 'org.seleniumhq.selenium:selenium-java:4.23.0'
+
+    // Thư viện tự động quản lý WebDriver (Nâng cấp phiên bản)
+    implementation 'io.github.bonigarcia:webdrivermanager:5.9.1'
+    // === KẾT THÚC THAY ĐỔI ===
     
     implementation 'org.liquibase:liquibase-core'
     
@@ -80,21 +88,15 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
 }
 
-tasks.named('test') {
-	useJUnitPlatform()
-}
-
-// Cấu hình trình biên dịch Java để tích hợp MapStruct và Lombok
-// Trong file build.gradle
 tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8' // Nên thêm dòng này để đảm bảo encoding UTF-8
+    options.encoding = 'UTF-8'
     options.getCompilerArgs().addAll([
-            '-parameters', // <-- THÊM DÒNG NÀY
+            '-parameters',
             '-Amapstruct.defaultComponentModel=spring',
             '-Amapstruct.unmappedTargetPolicy=IGNORE'
     ])
 }
-// Cấu hình để Gradle tự động tạo file .classpath cho Eclipse/STS
+
 eclipse {
     classpath {
         file {
@@ -109,5 +111,6 @@ eclipse {
 }
 
 test {
-    useJUnitPlatform()
+    useTestNG()
 }
+

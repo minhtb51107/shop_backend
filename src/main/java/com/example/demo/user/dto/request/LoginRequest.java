@@ -4,13 +4,12 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
-
+import lombok.NoArgsConstructor; // <-- THÊM IMPORT NÀY
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor // <-- THÊM ANNOTATION NÀY
 @AllArgsConstructor
 public class LoginRequest {
 

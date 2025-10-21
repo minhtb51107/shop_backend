@@ -5,10 +5,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor; // <-- THÊM IMPORT NÀY
 import lombok.Setter;
+
 
 @Getter
 @Setter
+@NoArgsConstructor // <-- THÊM ANNOTATION NÀY
 @AllArgsConstructor
 public class RegisterRequest {
 
