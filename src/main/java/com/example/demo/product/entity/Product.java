@@ -3,12 +3,15 @@ package com.example.demo.product.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Set; // <-- Cần import Set
+
 @Entity
 @Table(name = "products")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Product {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -32,5 +35,20 @@ public class Product {
     private Boolean isActive = true;
 
     private Boolean isDeleted = false;
-}
 
+    // --- PHẦN THÊM VÀO ĐỂ SỬA LỖI ---
+
+    /**
+     * mappedBy = "product" nghĩa là trong class ProductVariant
+     * cũng có một trường tên là @ManyToOne private Product product;
+     */
+    @OneToMany(mappedBy = "product")
+    private Set<ProductVariant> productVariants;
+
+    /**
+     * Tương tự, trong class ProductImage
+     * cũng có một trường tên là @ManyToOne private Product product;
+     */
+    @OneToMany(mappedBy = "product")
+    private Set<ProductImage> productImages;
+}
