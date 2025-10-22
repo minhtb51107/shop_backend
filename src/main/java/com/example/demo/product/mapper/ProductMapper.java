@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -54,7 +53,7 @@ public class ProductMapper {
      * Map từ Product Entity (đã fetch đủ variants, images) sang ProductResponse DTO.
      * Sử dụng VariantMapper và ProductImageMapper để map các danh sách.
      */
-    public ProductResponse toResponse(Product product, Set<ProductVariant> variants, Set<ProductImage> images) {
+    public ProductResponse toResponse(Product product, List<ProductVariant> variants, List<ProductImage> images) {
         if (product == null) return null;
 
         ProductResponse response = new ProductResponse();
