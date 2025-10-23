@@ -1,8 +1,21 @@
 package com.example.demo.product.entity;
 
-import com.example.demo.supplychain.entity.Warehouse;
-import jakarta.persistence.*;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
 
+import com.example.demo.sale.entity.OrderItem;
+import com.example.demo.sale.enums.OrderStatus;
+import com.example.demo.supplychain.entity.Warehouse;
+import com.example.demo.user.entity.Customer;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+
+@Getter
+@Setter
 @Entity
 @Table(name = "inventory")
 public class Inventory {
